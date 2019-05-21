@@ -7,7 +7,12 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-
-@interface GameScene : SKScene
-
+@interface GameScene : SKScene <SKPhysicsContactDelegate>
+@property (nonatomic) int lives;
+@property (nonatomic) int currentLevel;
+@property (nonatomic) int score;
+@property (nonatomic) int time;
+@property (nonatomic) BOOL gamePaused;
+@property (nonatomic) NSMutableArray* powerAnimations;
+- (instancetype)initWithSize:(CGSize)size andLevel:(int)level;
 @end

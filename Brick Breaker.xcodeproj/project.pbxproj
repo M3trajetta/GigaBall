@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0409F9BF225EE23E00CE9AFA /* Levels.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0409F9BE225EE23E00CE9AFA /* Levels.plist */; };
+		0409F9C5225F03D800CE9AFA /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 0409F9C4225F03D800CE9AFA /* Constants.m */; };
 		042EE7BA225AC6F0000D421C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7B9225AC6F0000D421C /* AppDelegate.m */; };
 		042EE7BC225AC6F0000D421C /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7BB225AC6F0000D421C /* GameScene.sks */; };
-		042EE7BE225AC6F0000D421C /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7BD225AC6F0000D421C /* Actions.sks */; };
 		042EE7C1225AC6F0000D421C /* GameScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7C0225AC6F0000D421C /* GameScene.m */; };
 		042EE7C4225AC6F0000D421C /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7C3225AC6F0000D421C /* GameViewController.m */; };
 		042EE7C7225AC6F0000D421C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7C5225AC6F0000D421C /* Main.storyboard */; };
@@ -18,6 +19,38 @@
 		042EE7CF225AC6F1000D421C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7CE225AC6F1000D421C /* main.m */; };
 		042EE7D9225AC6F1000D421C /* Brick_BreakerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7D8225AC6F1000D421C /* Brick_BreakerTests.m */; };
 		042EE7E4225AC6F1000D421C /* Brick_BreakerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7E3225AC6F1000D421C /* Brick_BreakerUITests.m */; };
+		042EE7F3225ADE51000D421C /* Brick.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7F2225ADE51000D421C /* Brick.m */; };
+		042EE7F5225C0EF6000D421C /* BrickExplosion.sks in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7F4225C0EF6000D421C /* BrickExplosion.sks */; };
+		042EE7F8225C127C000D421C /* Menu.m in Sources */ = {isa = PBXBuildFile; fileRef = 042EE7F7225C127C000D421C /* Menu.m */; };
+		042EE7FE225C1B60000D421C /* BallBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7F9225C1B5F000D421C /* BallBounce.caf */; };
+		042EE7FF225C1B60000D421C /* BallBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7F9225C1B5F000D421C /* BallBounce.caf */; };
+		042EE800225C1B60000D421C /* BallBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7F9225C1B5F000D421C /* BallBounce.caf */; };
+		042EE801225C1B60000D421C /* BrickSmash.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FA225C1B5F000D421C /* BrickSmash.caf */; };
+		042EE802225C1B60000D421C /* BrickSmash.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FA225C1B5F000D421C /* BrickSmash.caf */; };
+		042EE803225C1B60000D421C /* BrickSmash.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FA225C1B5F000D421C /* BrickSmash.caf */; };
+		042EE804225C1B60000D421C /* LoseLife.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FB225C1B5F000D421C /* LoseLife.caf */; };
+		042EE805225C1B60000D421C /* LoseLife.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FB225C1B5F000D421C /* LoseLife.caf */; };
+		042EE806225C1B60000D421C /* LoseLife.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FB225C1B5F000D421C /* LoseLife.caf */; };
+		042EE807225C1B60000D421C /* LevelUp.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FC225C1B60000D421C /* LevelUp.caf */; };
+		042EE808225C1B60000D421C /* LevelUp.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FC225C1B60000D421C /* LevelUp.caf */; };
+		042EE809225C1B60000D421C /* LevelUp.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FC225C1B60000D421C /* LevelUp.caf */; };
+		042EE80A225C1B60000D421C /* PaddleBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FD225C1B60000D421C /* PaddleBounce.caf */; };
+		042EE80B225C1B60000D421C /* PaddleBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FD225C1B60000D421C /* PaddleBounce.caf */; };
+		042EE80C225C1B60000D421C /* PaddleBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FD225C1B60000D421C /* PaddleBounce.caf */; };
+		043E7FE922868C4600A1AD72 /* Powers.plist in Resources */ = {isa = PBXBuildFile; fileRef = 043E7FE822868C4600A1AD72 /* Powers.plist */; };
+		046CE9F9226013BE006C99FD /* Ball.m in Sources */ = {isa = PBXBuildFile; fileRef = 046CE9F8226013BE006C99FD /* Ball.m */; };
+		046CE9FC22607728006C99FD /* Paddle.m in Sources */ = {isa = PBXBuildFile; fileRef = 046CE9FB22607728006C99FD /* Paddle.m */; };
+		046CEA092262E65E006C99FD /* BallTrail.sks in Resources */ = {isa = PBXBuildFile; fileRef = 046CEA082262E65E006C99FD /* BallTrail.sks */; };
+		049D23E7228A7CEE00F49175 /* Epilogue.m in Sources */ = {isa = PBXBuildFile; fileRef = 049D23E6228A7CEE00F49175 /* Epilogue.m */; };
+		04A1D23B2277014E00DDF0E4 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04A1D23A2277014E00DDF0E4 /* GameKit.framework */; };
+		04A1D23E22770CBF00DDF0E4 /* GameCenterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 04A1D23D22770CBF00DDF0E4 /* GameCenterManager.m */; };
+		04A6F9A5227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */; };
+		04A6F9A6227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */; };
+		04A6F9A7227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */; };
+		04CCCBC72281194300C05A6E /* ObservingTheStars.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04CCCBC62281194300C05A6E /* ObservingTheStars.caf */; };
+		04CCCBC82281194300C05A6E /* ObservingTheStars.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04CCCBC62281194300C05A6E /* ObservingTheStars.caf */; };
+		04CCCBC92281194300C05A6E /* ObservingTheStars.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04CCCBC62281194300C05A6E /* ObservingTheStars.caf */; };
+		04CCCBCB22811B9200C05A6E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CCCBCA22811B9200C05A6E /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,11 +71,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0409F9BE225EE23E00CE9AFA /* Levels.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Levels.plist; sourceTree = "<group>"; };
+		0409F9C3225F03D800CE9AFA /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		0409F9C4225F03D800CE9AFA /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		042EE7B5225AC6F0000D421C /* Brick Breaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Brick Breaker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		042EE7B8225AC6F0000D421C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		042EE7B9225AC6F0000D421C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		042EE7BB225AC6F0000D421C /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		042EE7BD225AC6F0000D421C /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		042EE7BF225AC6F0000D421C /* GameScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameScene.h; sourceTree = "<group>"; };
 		042EE7C0225AC6F0000D421C /* GameScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameScene.m; sourceTree = "<group>"; };
 		042EE7C2225AC6F0000D421C /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
@@ -58,6 +93,30 @@
 		042EE7DF225AC6F1000D421C /* Brick BreakerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Brick BreakerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		042EE7E3225AC6F1000D421C /* Brick_BreakerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Brick_BreakerUITests.m; sourceTree = "<group>"; };
 		042EE7E5225AC6F1000D421C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		042EE7F1225ADE51000D421C /* Brick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Brick.h; sourceTree = "<group>"; };
+		042EE7F2225ADE51000D421C /* Brick.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Brick.m; sourceTree = "<group>"; };
+		042EE7F4225C0EF6000D421C /* BrickExplosion.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BrickExplosion.sks; sourceTree = "<group>"; };
+		042EE7F6225C127C000D421C /* Menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Menu.h; sourceTree = "<group>"; };
+		042EE7F7225C127C000D421C /* Menu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Menu.m; sourceTree = "<group>"; };
+		042EE7F9225C1B5F000D421C /* BallBounce.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = BallBounce.caf; sourceTree = "<group>"; };
+		042EE7FA225C1B5F000D421C /* BrickSmash.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = BrickSmash.caf; sourceTree = "<group>"; };
+		042EE7FB225C1B5F000D421C /* LoseLife.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = LoseLife.caf; sourceTree = "<group>"; };
+		042EE7FC225C1B60000D421C /* LevelUp.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = LevelUp.caf; sourceTree = "<group>"; };
+		042EE7FD225C1B60000D421C /* PaddleBounce.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PaddleBounce.caf; sourceTree = "<group>"; };
+		043E7FE822868C4600A1AD72 /* Powers.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Powers.plist; sourceTree = "<group>"; };
+		046CE9F7226013BE006C99FD /* Ball.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Ball.h; sourceTree = "<group>"; };
+		046CE9F8226013BE006C99FD /* Ball.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Ball.m; sourceTree = "<group>"; };
+		046CE9FA22607728006C99FD /* Paddle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Paddle.h; sourceTree = "<group>"; };
+		046CE9FB22607728006C99FD /* Paddle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Paddle.m; sourceTree = "<group>"; };
+		046CEA082262E65E006C99FD /* BallTrail.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BallTrail.sks; sourceTree = "<group>"; };
+		049D23E5228A7CEE00F49175 /* Epilogue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Epilogue.h; sourceTree = "<group>"; };
+		049D23E6228A7CEE00F49175 /* Epilogue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Epilogue.m; sourceTree = "<group>"; };
+		04A1D23A2277014E00DDF0E4 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		04A1D23C22770CBF00DDF0E4 /* GameCenterManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameCenterManager.h; sourceTree = "<group>"; };
+		04A1D23D22770CBF00DDF0E4 /* GameCenterManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameCenterManager.m; sourceTree = "<group>"; };
+		04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Oswald-Bold.ttf"; sourceTree = "<group>"; };
+		04CCCBC62281194300C05A6E /* ObservingTheStars.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ObservingTheStars.caf; sourceTree = "<group>"; };
+		04CCCBCA22811B9200C05A6E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +124,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04CCCBCB22811B9200C05A6E /* AVFoundation.framework in Frameworks */,
+				04A1D23B2277014E00DDF0E4 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +146,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0409F9BD225ED3F100CE9AFA /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				04CCCBC62281194300C05A6E /* ObservingTheStars.caf */,
+				042EE7F9225C1B5F000D421C /* BallBounce.caf */,
+				042EE7FA225C1B5F000D421C /* BrickSmash.caf */,
+				042EE7FC225C1B60000D421C /* LevelUp.caf */,
+				042EE7FB225C1B5F000D421C /* LoseLife.caf */,
+				042EE7FD225C1B60000D421C /* PaddleBounce.caf */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 		042EE7AC225AC6F0000D421C = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +166,7 @@
 				042EE7D7225AC6F1000D421C /* Brick BreakerTests */,
 				042EE7E2225AC6F1000D421C /* Brick BreakerUITests */,
 				042EE7B6225AC6F0000D421C /* Products */,
+				04A1D2372276FF7600DDF0E4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,19 +183,38 @@
 		042EE7B7225AC6F0000D421C /* Brick Breaker */ = {
 			isa = PBXGroup;
 			children = (
+				0409F9BD225ED3F100CE9AFA /* Sounds */,
+				042EE7C8225AC6F1000D421C /* Assets.xcassets */,
 				042EE7B8225AC6F0000D421C /* AppDelegate.h */,
 				042EE7B9225AC6F0000D421C /* AppDelegate.m */,
+				046CE9F7226013BE006C99FD /* Ball.h */,
+				046CE9F8226013BE006C99FD /* Ball.m */,
+				046CEA082262E65E006C99FD /* BallTrail.sks */,
+				042EE7F1225ADE51000D421C /* Brick.h */,
+				042EE7F2225ADE51000D421C /* Brick.m */,
+				042EE7F4225C0EF6000D421C /* BrickExplosion.sks */,
+				0409F9C3225F03D800CE9AFA /* Constants.h */,
+				0409F9C4225F03D800CE9AFA /* Constants.m */,
+				049D23E5228A7CEE00F49175 /* Epilogue.h */,
+				049D23E6228A7CEE00F49175 /* Epilogue.m */,
 				042EE7BB225AC6F0000D421C /* GameScene.sks */,
-				042EE7BD225AC6F0000D421C /* Actions.sks */,
 				042EE7BF225AC6F0000D421C /* GameScene.h */,
 				042EE7C0225AC6F0000D421C /* GameScene.m */,
+				04A1D23C22770CBF00DDF0E4 /* GameCenterManager.h */,
+				04A1D23D22770CBF00DDF0E4 /* GameCenterManager.m */,
 				042EE7C2225AC6F0000D421C /* GameViewController.h */,
 				042EE7C3225AC6F0000D421C /* GameViewController.m */,
 				042EE7C5225AC6F0000D421C /* Main.storyboard */,
-				042EE7C8225AC6F1000D421C /* Assets.xcassets */,
 				042EE7CA225AC6F1000D421C /* LaunchScreen.storyboard */,
 				042EE7CD225AC6F1000D421C /* Info.plist */,
 				042EE7CE225AC6F1000D421C /* main.m */,
+				042EE7F6225C127C000D421C /* Menu.h */,
+				042EE7F7225C127C000D421C /* Menu.m */,
+				0409F9BE225EE23E00CE9AFA /* Levels.plist */,
+				043E7FE822868C4600A1AD72 /* Powers.plist */,
+				046CE9FA22607728006C99FD /* Paddle.h */,
+				046CE9FB22607728006C99FD /* Paddle.m */,
+				04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */,
 			);
 			path = "Brick Breaker";
 			sourceTree = "<group>";
@@ -141,6 +235,15 @@
 				042EE7E5225AC6F1000D421C /* Info.plist */,
 			);
 			path = "Brick BreakerUITests";
+			sourceTree = "<group>";
+		};
+		04A1D2372276FF7600DDF0E4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				04CCCBCA22811B9200C05A6E /* AVFoundation.framework */,
+				04A1D23A2277014E00DDF0E4 /* GameKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -210,6 +313,11 @@
 				TargetAttributes = {
 					042EE7B4225AC6F0000D421C = {
 						CreatedOnToolsVersion = 10.2;
+						SystemCapabilities = {
+							com.apple.GameCenter.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					042EE7D3225AC6F1000D421C = {
 						CreatedOnToolsVersion = 10.2;
@@ -246,11 +354,21 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				042EE80A225C1B60000D421C /* PaddleBounce.caf in Resources */,
+				042EE807225C1B60000D421C /* LevelUp.caf in Resources */,
+				04A6F9A5227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */,
+				043E7FE922868C4600A1AD72 /* Powers.plist in Resources */,
+				0409F9BF225EE23E00CE9AFA /* Levels.plist in Resources */,
+				046CEA092262E65E006C99FD /* BallTrail.sks in Resources */,
 				042EE7C7225AC6F0000D421C /* Main.storyboard in Resources */,
 				042EE7BC225AC6F0000D421C /* GameScene.sks in Resources */,
 				042EE7C9225AC6F1000D421C /* Assets.xcassets in Resources */,
 				042EE7CC225AC6F1000D421C /* LaunchScreen.storyboard in Resources */,
-				042EE7BE225AC6F0000D421C /* Actions.sks in Resources */,
+				042EE804225C1B60000D421C /* LoseLife.caf in Resources */,
+				04CCCBC72281194300C05A6E /* ObservingTheStars.caf in Resources */,
+				042EE801225C1B60000D421C /* BrickSmash.caf in Resources */,
+				042EE7FE225C1B60000D421C /* BallBounce.caf in Resources */,
+				042EE7F5225C0EF6000D421C /* BrickExplosion.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +376,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				042EE808225C1B60000D421C /* LevelUp.caf in Resources */,
+				042EE80B225C1B60000D421C /* PaddleBounce.caf in Resources */,
+				042EE7FF225C1B60000D421C /* BallBounce.caf in Resources */,
+				04CCCBC82281194300C05A6E /* ObservingTheStars.caf in Resources */,
+				042EE805225C1B60000D421C /* LoseLife.caf in Resources */,
+				042EE802225C1B60000D421C /* BrickSmash.caf in Resources */,
+				04A6F9A6227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +390,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				042EE809225C1B60000D421C /* LevelUp.caf in Resources */,
+				042EE80C225C1B60000D421C /* PaddleBounce.caf in Resources */,
+				042EE800225C1B60000D421C /* BallBounce.caf in Resources */,
+				04CCCBC92281194300C05A6E /* ObservingTheStars.caf in Resources */,
+				042EE806225C1B60000D421C /* LoseLife.caf in Resources */,
+				042EE803225C1B60000D421C /* BrickSmash.caf in Resources */,
+				04A6F9A7227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +409,13 @@
 			files = (
 				042EE7C1225AC6F0000D421C /* GameScene.m in Sources */,
 				042EE7C4225AC6F0000D421C /* GameViewController.m in Sources */,
+				042EE7F8225C127C000D421C /* Menu.m in Sources */,
+				046CE9FC22607728006C99FD /* Paddle.m in Sources */,
+				0409F9C5225F03D800CE9AFA /* Constants.m in Sources */,
+				046CE9F9226013BE006C99FD /* Ball.m in Sources */,
+				04A1D23E22770CBF00DDF0E4 /* GameCenterManager.m in Sources */,
+				049D23E7228A7CEE00F49175 /* Epilogue.m in Sources */,
+				042EE7F3225ADE51000D421C /* Brick.m in Sources */,
 				042EE7CF225AC6F1000D421C /* main.m in Sources */,
 				042EE7BA225AC6F0000D421C /* AppDelegate.m in Sources */,
 			);
@@ -456,7 +595,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mido.Brick-Breaker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mido.gigaball;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -473,7 +612,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mido.Brick-Breaker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mido.gigaball;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
