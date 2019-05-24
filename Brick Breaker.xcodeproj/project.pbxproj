@@ -38,6 +38,10 @@
 		042EE80B225C1B60000D421C /* PaddleBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FD225C1B60000D421C /* PaddleBounce.caf */; };
 		042EE80C225C1B60000D421C /* PaddleBounce.caf in Resources */ = {isa = PBXBuildFile; fileRef = 042EE7FD225C1B60000D421C /* PaddleBounce.caf */; };
 		043E7FE922868C4600A1AD72 /* Powers.plist in Resources */ = {isa = PBXBuildFile; fileRef = 043E7FE822868C4600A1AD72 /* Powers.plist */; };
+		044C6EBB2293ACB3002A0641 /* AudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 044C6EBA2293ACB2002A0641 /* AudioPlayer.m */; };
+		044C6EBD2293AF42002A0641 /* GameLoop.caf in Resources */ = {isa = PBXBuildFile; fileRef = 044C6EBC2293AF42002A0641 /* GameLoop.caf */; };
+		044C6EBF2293BD97002A0641 /* ChillTrap.caf in Resources */ = {isa = PBXBuildFile; fileRef = 044C6EBE2293BD97002A0641 /* ChillTrap.caf */; };
+		044C6EC12293C123002A0641 /* MarimbaBoy.caf in Resources */ = {isa = PBXBuildFile; fileRef = 044C6EC02293C123002A0641 /* MarimbaBoy.caf */; };
 		046CE9F9226013BE006C99FD /* Ball.m in Sources */ = {isa = PBXBuildFile; fileRef = 046CE9F8226013BE006C99FD /* Ball.m */; };
 		046CE9FC22607728006C99FD /* Paddle.m in Sources */ = {isa = PBXBuildFile; fileRef = 046CE9FB22607728006C99FD /* Paddle.m */; };
 		046CEA092262E65E006C99FD /* BallTrail.sks in Resources */ = {isa = PBXBuildFile; fileRef = 046CEA082262E65E006C99FD /* BallTrail.sks */; };
@@ -47,9 +51,6 @@
 		04A6F9A5227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */; };
 		04A6F9A6227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */; };
 		04A6F9A7227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */; };
-		04CCCBC72281194300C05A6E /* ObservingTheStars.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04CCCBC62281194300C05A6E /* ObservingTheStars.caf */; };
-		04CCCBC82281194300C05A6E /* ObservingTheStars.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04CCCBC62281194300C05A6E /* ObservingTheStars.caf */; };
-		04CCCBC92281194300C05A6E /* ObservingTheStars.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04CCCBC62281194300C05A6E /* ObservingTheStars.caf */; };
 		04CCCBCB22811B9200C05A6E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CCCBCA22811B9200C05A6E /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -104,6 +105,11 @@
 		042EE7FC225C1B60000D421C /* LevelUp.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = LevelUp.caf; sourceTree = "<group>"; };
 		042EE7FD225C1B60000D421C /* PaddleBounce.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PaddleBounce.caf; sourceTree = "<group>"; };
 		043E7FE822868C4600A1AD72 /* Powers.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Powers.plist; sourceTree = "<group>"; };
+		044C6EB92293ACB2002A0641 /* AudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
+		044C6EBA2293ACB2002A0641 /* AudioPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioPlayer.m; sourceTree = "<group>"; };
+		044C6EBC2293AF42002A0641 /* GameLoop.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GameLoop.caf; sourceTree = "<group>"; };
+		044C6EBE2293BD97002A0641 /* ChillTrap.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ChillTrap.caf; sourceTree = "<group>"; };
+		044C6EC02293C123002A0641 /* MarimbaBoy.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MarimbaBoy.caf; sourceTree = "<group>"; };
 		046CE9F7226013BE006C99FD /* Ball.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Ball.h; sourceTree = "<group>"; };
 		046CE9F8226013BE006C99FD /* Ball.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Ball.m; sourceTree = "<group>"; };
 		046CE9FA22607728006C99FD /* Paddle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Paddle.h; sourceTree = "<group>"; };
@@ -115,7 +121,6 @@
 		04A1D23C22770CBF00DDF0E4 /* GameCenterManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameCenterManager.h; sourceTree = "<group>"; };
 		04A1D23D22770CBF00DDF0E4 /* GameCenterManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameCenterManager.m; sourceTree = "<group>"; };
 		04A6F9A4227FD0DA00E713EC /* Oswald-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Oswald-Bold.ttf"; sourceTree = "<group>"; };
-		04CCCBC62281194300C05A6E /* ObservingTheStars.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ObservingTheStars.caf; sourceTree = "<group>"; };
 		04CCCBCA22811B9200C05A6E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -149,8 +154,10 @@
 		0409F9BD225ED3F100CE9AFA /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
-				04CCCBC62281194300C05A6E /* ObservingTheStars.caf */,
+				044C6EBE2293BD97002A0641 /* ChillTrap.caf */,
+				044C6EBC2293AF42002A0641 /* GameLoop.caf */,
 				042EE7F9225C1B5F000D421C /* BallBounce.caf */,
+				044C6EC02293C123002A0641 /* MarimbaBoy.caf */,
 				042EE7FA225C1B5F000D421C /* BrickSmash.caf */,
 				042EE7FC225C1B60000D421C /* LevelUp.caf */,
 				042EE7FB225C1B5F000D421C /* LoseLife.caf */,
@@ -187,6 +194,8 @@
 				042EE7C8225AC6F1000D421C /* Assets.xcassets */,
 				042EE7B8225AC6F0000D421C /* AppDelegate.h */,
 				042EE7B9225AC6F0000D421C /* AppDelegate.m */,
+				044C6EB92293ACB2002A0641 /* AudioPlayer.h */,
+				044C6EBA2293ACB2002A0641 /* AudioPlayer.m */,
 				046CE9F7226013BE006C99FD /* Ball.h */,
 				046CE9F8226013BE006C99FD /* Ball.m */,
 				046CEA082262E65E006C99FD /* BallTrail.sks */,
@@ -360,13 +369,15 @@
 				043E7FE922868C4600A1AD72 /* Powers.plist in Resources */,
 				0409F9BF225EE23E00CE9AFA /* Levels.plist in Resources */,
 				046CEA092262E65E006C99FD /* BallTrail.sks in Resources */,
+				044C6EBD2293AF42002A0641 /* GameLoop.caf in Resources */,
+				044C6EC12293C123002A0641 /* MarimbaBoy.caf in Resources */,
 				042EE7C7225AC6F0000D421C /* Main.storyboard in Resources */,
 				042EE7BC225AC6F0000D421C /* GameScene.sks in Resources */,
 				042EE7C9225AC6F1000D421C /* Assets.xcassets in Resources */,
 				042EE7CC225AC6F1000D421C /* LaunchScreen.storyboard in Resources */,
 				042EE804225C1B60000D421C /* LoseLife.caf in Resources */,
-				04CCCBC72281194300C05A6E /* ObservingTheStars.caf in Resources */,
 				042EE801225C1B60000D421C /* BrickSmash.caf in Resources */,
+				044C6EBF2293BD97002A0641 /* ChillTrap.caf in Resources */,
 				042EE7FE225C1B60000D421C /* BallBounce.caf in Resources */,
 				042EE7F5225C0EF6000D421C /* BrickExplosion.sks in Resources */,
 			);
@@ -379,7 +390,6 @@
 				042EE808225C1B60000D421C /* LevelUp.caf in Resources */,
 				042EE80B225C1B60000D421C /* PaddleBounce.caf in Resources */,
 				042EE7FF225C1B60000D421C /* BallBounce.caf in Resources */,
-				04CCCBC82281194300C05A6E /* ObservingTheStars.caf in Resources */,
 				042EE805225C1B60000D421C /* LoseLife.caf in Resources */,
 				042EE802225C1B60000D421C /* BrickSmash.caf in Resources */,
 				04A6F9A6227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */,
@@ -393,7 +403,6 @@
 				042EE809225C1B60000D421C /* LevelUp.caf in Resources */,
 				042EE80C225C1B60000D421C /* PaddleBounce.caf in Resources */,
 				042EE800225C1B60000D421C /* BallBounce.caf in Resources */,
-				04CCCBC92281194300C05A6E /* ObservingTheStars.caf in Resources */,
 				042EE806225C1B60000D421C /* LoseLife.caf in Resources */,
 				042EE803225C1B60000D421C /* BrickSmash.caf in Resources */,
 				04A6F9A7227FD0DA00E713EC /* Oswald-Bold.ttf in Resources */,
@@ -414,6 +423,7 @@
 				0409F9C5225F03D800CE9AFA /* Constants.m in Sources */,
 				046CE9F9226013BE006C99FD /* Ball.m in Sources */,
 				04A1D23E22770CBF00DDF0E4 /* GameCenterManager.m in Sources */,
+				044C6EBB2293ACB3002A0641 /* AudioPlayer.m in Sources */,
 				049D23E7228A7CEE00F49175 /* Epilogue.m in Sources */,
 				042EE7F3225ADE51000D421C /* Brick.m in Sources */,
 				042EE7CF225AC6F1000D421C /* main.m in Sources */,

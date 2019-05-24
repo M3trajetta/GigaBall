@@ -12,8 +12,17 @@
     },
     {
       "idiom" : "universal",
-      "filename" : "sound-off@3x.png",
       "scale" : "3x"
+    },
+    {
+      "idiom" : "ipad",
+      "filename" : "sound-off@3x.png",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "ipad",
+      "filename" : "sound-off@3x-1.png",
+      "scale" : "2x"
     }
   ],
   "info" : {

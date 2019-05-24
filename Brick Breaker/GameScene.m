@@ -13,6 +13,7 @@
 #import "Menu.h"
 #import "Constants.h"
 #import "Epilogue.h"
+#import "AudioPlayer.h"
 #import "GameCenterManager.h"
 
 static const int POWERUPS = 13;
@@ -21,15 +22,23 @@ static const int POWERUPS = 13;
     Ball* _ball;
     Paddle* _paddle;
     Menu* _menu;
+    AudioPlayer* _player;
+    AVAudioPlayer* _audioPlayer;
     SKSpriteNode* _pause;
     SKSpriteNode* _powerUp;
     SKSpriteNode* _pauseMenu;
     SKSpriteNode* _background;
     SKSpriteNode* _shield;
     SKSpriteNode* _paddleControl;
+    SKSpriteNode* _sound;
+    SKSpriteNode* _musicSlider;
+    SKSpriteNode* _musicScrollBar;
+    SKNode* _settings;
     SKNode* _brickLayer;
     CGPoint _touchLocation;
     CGPoint _paddlePosition;
+    CGPoint _touchLocationMusic;
+    CGPoint _touchLocationSound;
     BOOL _ballReleased;
     BOOL _positioningBall;
     BOOL _canShoot;
@@ -47,12 +56,17 @@ static const int POWERUPS = 13;
     SKLabelNode* _timeDisplay;
     SKTextureAtlas* _graphics;
     SKAction* _paddleAnimation;
+    SKAction* _brickSmashSound;
     SKAction* _ballBounceSound;
     SKAction* _paddleBounceSound;
     SKAction* _levelUpSound;
     SKAction* _loseLifeSound;
     float _multiplier;
     NSTimer* _timer;
+    NSUserDefaults* _user;
+    int _spacing;
+    int _smallSpace;
+    int _addSizeToFont;
 }
 
 static const int MIN_SPEED_BALL = 200;
@@ -66,6 +80,25 @@ CGFloat BALL_SPEED = 400;
         
         // Get atlas
         _graphics = [SKTextureAtlas atlasNamed:@"Graphics"];
+        
+        _user = [NSUserDefaults standardUserDefaults];
+        
+        CGFloat screenWidth = size.width;
+        if(screenWidth <= 400){
+            NSLog(@"LESS THAN 400");
+            _spacing = 10;
+            _smallSpace = 5;
+            _addSizeToFont = 5;
+            
+        } else if(screenWidth > 500 && UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)){
+            _spacing = 50;
+            _smallSpace = 15;
+            _addSizeToFont = 20;
+        } else {
+            _spacing = 0;
+            _smallSpace = 0;
+            _addSizeToFont = 0;
+        }
         
         // Add bg
         _background = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"bg-game"]];
@@ -92,7 +125,7 @@ CGFloat BALL_SPEED = 400;
                     [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"heart-full"]]];
         for (NSUInteger i=0; i < _hearts.count; i++) {
             SKSpriteNode* heart = (SKSpriteNode*)[_hearts objectAtIndex:i];
-            heart.position = CGPointMake(16 + 29 * i, self.size.height - 20);
+            heart.position = CGPointMake(20 + 29 * i + _smallSpace * i, self.size.height - 20);
             [self addChild:heart];
         }
         
@@ -122,6 +155,7 @@ CGFloat BALL_SPEED = 400;
         
         // Set up sounds
         _ballBounceSound = [SKAction playSoundFileNamed:@"BallBounce" waitForCompletion:NO];
+        _brickSmashSound = [SKAction playSoundFileNamed:@"BrickSmash" waitForCompletion:NO];
         _paddleBounceSound = [SKAction playSoundFileNamed:@"PaddleBounce" waitForCompletion:NO];
         _levelUpSound = [SKAction playSoundFileNamed:@"LevelUp" waitForCompletion:NO];
         _loseLifeSound = [SKAction playSoundFileNamed:@"LoseLife" waitForCompletion:NO];
@@ -154,15 +188,23 @@ CGFloat BALL_SPEED = 400;
         _ballIsOnPaddle = NO;
         
         // Load sound setting
-        NSUserDefaults* user = [NSUserDefaults standardUserDefaults];
-        NSString* soundOn = [user stringForKey:@"sounds-on"];
+        NSString* soundOn = [_user stringForKey:@"sounds-on"];
+        float volume = [[_user stringForKey:@"volume"] floatValue];
+        NSLog(@"VOLUME: %f", volume);
         
         // Add Sounds on / off button
         if(soundOn) _soundOn = [soundOn boolValue];
         
+        if(!_player.isPlaying) {
+            _player = [[AudioPlayer alloc]init:@"GameLoop"];
+            if(volume) _player.audioPlayer.volume = volume;
+            else _player.audioPlayer.volume = 0.5;
+            [_player.audioPlayer play];
+            _player.isPlaying = YES;
+        }
         [self loadLevel:self.currentLevel];
         [self newBall];
-        
+        NSLog(@"Total Score: %d", self.totalScore);
     }
     return self;
 }
@@ -291,6 +333,10 @@ CGFloat BALL_SPEED = 400;
     _scoreDisplay.text = [NSString stringWithFormat:@"SCORE %d", self.score];
 }
 
+- (void)setTotalScore:(int)totalScore{
+    _totalScore = totalScore;
+}
+
 - (void)setGamePaused:(BOOL)gamePaused{
     if(!_gameOver){
         _gamePaused = gamePaused;
@@ -324,13 +370,13 @@ CGFloat BALL_SPEED = 400;
             if(brickType > 0){
                 Brick* brick = [[Brick alloc]initWithType:(BrickType)brickType];
                 if(brick){
-                    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-                        brick.size = CGSizeMake(brick.size.width * 1.5, brick.size.height * 1.5);
-                        brick.position = CGPointMake(20 + (brick.size.width * 0.5) + (brick.size.width + 6) * col,
-                                                     -(20 + (brick.size.height * 0.5) + (brick.size.height + 6) * row));
-                    }else {
-                        brick.position = CGPointMake(10 + (brick.size.width * 0.5) + (brick.size.width + 3) * col,
-                                                 -(10 + (brick.size.height * 0.5) + (brick.size.height + 3) * row));
+                    if(_smallSpace > 5){
+                        brick.size = CGSizeMake(brick.size.width * 1.2, brick.size.height * 1.2);
+                        brick.position = CGPointMake(30 + (brick.size.width * 0.5) + (brick.size.width + 5) * col,
+                                                     -(10 + (brick.size.height * 0.5) + (brick.size.height + 5) * row));
+                    } else{
+                        brick.position = CGPointMake(10 + (brick.size.width * 0.5 - _smallSpace) + (brick.size.width + 3 - _smallSpace) * col,
+                                                     -(10 + (brick.size.height * 0.5 - _smallSpace) + (brick.size.height + 3 - _smallSpace) * row));
                     }
                     brick.powerUp = powerUp;
                     brick.hitBrick = hit;
@@ -419,6 +465,7 @@ CGFloat BALL_SPEED = 400;
         }
         if([secondBody.node respondsToSelector:@selector(hit)]){
             [secondBody.node performSelector:@selector(hit)];
+            if(_soundOn) [self runAction:_brickSmashSound];
             if(((Brick*)secondBody.node).powerUp > 0 && ((Brick*)secondBody.node).hitBrick == 0){
                 [self dropPowerUp:secondBody.node.position andPowerUp:((Brick*)secondBody.node).powerUp];
             }
@@ -481,15 +528,6 @@ CGFloat BALL_SPEED = 400;
                 [node removeFromParent];
                 [self createBallWithLocation:ballPos andVelocity:ballVel andType:Energy];
             }];
-            
-
-            // Add trail
-            NSString* trailPath = [[NSBundle mainBundle] pathForResource:@"BallTrail" ofType:@"sks"];
-            SKEmitterNode* ballTrail = [NSKeyedUnarchiver unarchiveObjectWithFile:trailPath];
-            ballTrail.targetNode = self;
-            [_ball addChild: ballTrail];
-            _ball.trail = ballTrail;
-            [_ball updateTrail];
         }
         if([secondBody.node.name isEqualToString:@"11"]){
            // Random Power
@@ -523,7 +561,8 @@ CGFloat BALL_SPEED = 400;
     // Contact between ball and bottom of screen
     if (firstBody.categoryBitMask == ballCategory && secondBody.categoryBitMask == bottomCategory) {
         // For some reason this function is called twice
-        if([firstBody.node.children count] < 1 && firstBody.node){
+        if(firstBody.node){
+            // TODO: Bug - Multiball takes life
             self.lives--;
         }
         [firstBody.node removeFromParent];
@@ -647,37 +686,37 @@ CGFloat BALL_SPEED = 400;
     
     _levelDisplay = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
     _levelDisplay.fontColor = [SKColor whiteColor];
-    _levelDisplay.text = [NSString stringWithFormat:@"LEVEL %d", self.currentLevel];
-    _levelDisplay.fontSize = 30;
-    _levelDisplay.position = CGPointMake(-60, 60);
+    _levelDisplay.text = [NSString stringWithFormat:@"Level %d", self.currentLevel];
+    _levelDisplay.fontSize = 30 + _addSizeToFont;
+    _levelDisplay.position = CGPointMake(-60 - _spacing, 60);
     [_pauseMenu addChild:_levelDisplay];
     
     // Time
     _timeDisplay = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    _timeDisplay.text = [NSString stringWithFormat:@"TIME %d", self.time];
+    _timeDisplay.text = [NSString stringWithFormat:@"Time %ds", self.time];
     _timeDisplay.fontColor = [SKColor whiteColor];
-    _timeDisplay.fontSize = 30;
-    _timeDisplay.position = CGPointMake(50, 60);
+    _timeDisplay.fontSize = 30 + _addSizeToFont;
+    _timeDisplay.position = CGPointMake(50 + _spacing, 60);
     [_pauseMenu addChild:_timeDisplay];
     
     SKSpriteNode* btnHome = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-home"]];
     btnHome.name = @"home";
-    btnHome.position = CGPointMake(-75, -5);
+    btnHome.position = CGPointMake(-75 - _spacing, -5 - _spacing);
     [_pauseMenu addChild:btnHome];
     
     SKSpriteNode* btnRestart = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-restart"]];
     btnRestart.name = @"restart";
-    btnRestart.position = CGPointMake(0, -5);
+    btnRestart.position = CGPointMake(0, -5 - _spacing);
     [_pauseMenu addChild:btnRestart];
     
     SKSpriteNode* btnSettings = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-settings"]];
     btnSettings.name = @"settings";
-    btnSettings.position = CGPointMake(75, -5);
+    btnSettings.position = CGPointMake(75 + _spacing, -5 - _spacing);
     [_pauseMenu addChild:btnSettings];
     
     SKSpriteNode* btnContinue = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-continue"]];
     btnContinue.name = @"continue";
-    btnContinue.position = CGPointMake(0, -100);
+    btnContinue.position = CGPointMake(0, -100 - _spacing * 2 + _smallSpace);
     [_pauseMenu addChild:btnContinue];
     
     _pauseMenu.zPosition = 1;
@@ -693,12 +732,21 @@ CGFloat BALL_SPEED = 400;
         if(_canShoot){
             [self shootBangPower];
         }
-        
+        SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
+        if([node.name isEqualToString:@"music"]){
+            _touchLocationMusic = [touch locationInNode:self];
+        }
+        if([node.name isEqualToString:@"sounds"]){
+            _touchLocationSound = [touch locationInNode:self];
+        }
     }
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    CGFloat minX = -_musicScrollBar.size.width * 0.5;
+    CGFloat maxX = _musicScrollBar.size.width * 0.5;
     for (UITouch *touch in touches) {
+        SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
         if(!self.paused){
             // Calculate how far the touch moved
             CGFloat xMovement = [touch locationInNode:self].x - _touchLocation.x;
@@ -717,6 +765,22 @@ CGFloat BALL_SPEED = 400;
             if(_paddle.position.x < paddleMinX) { _paddle.position = CGPointMake(paddleMinX, _paddle.position.y); }
             if(_paddle.position.x > paddleMaxX) { _paddle.position = CGPointMake(paddleMaxX, _paddle.position.y); }
             _touchLocation = [touch locationInNode:self];
+        }
+        if([node.name isEqualToString:@"music"]){
+            // Calculate how far the touch moved
+            CGFloat xMovementMusic = [touch locationInNode:self].x - _touchLocationMusic.x;
+            // Move paddle distance of touch
+            _musicSlider.position = CGPointMake(_musicSlider.position.x + xMovementMusic, _musicSlider.position.y);
+            // Cap music slider position so it remains on the screen
+            if(_musicSlider.position.x < minX) { _musicSlider.position = CGPointMake(minX, _musicSlider.position.y); }
+            if(_musicSlider.position.x > maxX) { _musicSlider.position = CGPointMake(maxX, _musicSlider.position.y); }
+            _touchLocationMusic = [touch locationInNode:self];
+            _player.audioPlayer.volume = (_musicSlider.position.x + 93) / 186;
+            if(_player.audioPlayer.volume == 0){
+                _musicSlider.texture = [SKTexture textureWithImageNamed:@"music-off"];
+            } else {
+                _musicSlider.texture = [SKTexture textureWithImageNamed:@"settings-slider"];
+            }
         }
     }
 }
@@ -738,11 +802,12 @@ CGFloat BALL_SPEED = 400;
             }
         } else {
             _pauseMenu = (SKSpriteNode*)[self childNodeWithName: @"_pauseMenu"];
-            SKNode* node = [_pauseMenu nodeAtPoint: [t locationInNode:_pauseMenu]];
+            SKNode* node = [self nodeAtPoint: [t locationInNode:self]];
             if([node.name isEqualToString:@"home"]){
                 // Go to main screen
-                NSLog(@"Go to main screen");
                 SKScene *homeScene = [[Menu alloc]initWithSize:self.size];
+                _player.isPlaying = NO;
+                [_player.audioPlayer stop];
                 [self.view presentScene:homeScene];
             }
             if([node.name isEqualToString:@"restart"]){
@@ -750,6 +815,7 @@ CGFloat BALL_SPEED = 400;
                 _background.texture = [SKTexture textureWithImageNamed:@"bg-game"];
                 // TODO: Bug found - fix gameover situation if ball not released
                 NSLog(@"Restart");
+                self.score = 0;
                 [self loadLevel:self.currentLevel];
                 [self newBall];
                 self.gamePaused = NO;
@@ -758,6 +824,8 @@ CGFloat BALL_SPEED = 400;
             if([node.name isEqualToString:@"settings"]){
                 // Show settings menu
                 NSLog(@"Settings");
+                [_pauseMenu removeFromParent];
+                [self showSettings];
             }
             if([node.name isEqualToString:@"continue"]){
                 // Continue Game
@@ -765,8 +833,91 @@ CGFloat BALL_SPEED = 400;
                 [_pauseMenu removeFromParent];
                 self.gamePaused = NO;
             }
+            if([node.name isEqualToString:@"sound"]){
+                _soundOn = !_soundOn;
+                [_user setObject:[NSString stringWithFormat:@"%d",_soundOn] forKey:@"sounds-on"];
+                if (_soundOn) {
+                    _sound.texture = [SKTexture textureWithImageNamed:@"sound-on"];
+                } else {
+                    _sound.texture = [SKTexture textureWithImageNamed:@"sound-off"];
+                }
+            }
+            if([node.name isEqualToString:@"okay"]){
+                [_settings removeFromParent];
+                [self showMenu];
+            }
         }
     }
+}
+
+- (void)showSettings{
+    // Foreground for the settings
+    _settings = [[SKNode node]init];
+    _settings.position = CGPointMake(self.size.width * 0.5, self.size.height * 0.5);
+    [self addChild:_settings];
+    
+    // Add the box for the settings
+    SKSpriteNode* settings = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings-bg"]];
+    settings.position = CGPointZero;
+    [_settings addChild:settings];
+    
+    // Add title for the box
+    SKLabelNode* title = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+    title.fontColor = [SKColor whiteColor];
+    title.fontSize = 50;
+    title.text = @"Settings";
+    title.position = CGPointMake(0, 120);
+    [_settings addChild:title];
+    
+    // Add Sounds Label
+    SKLabelNode* soundsLabel = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+    soundsLabel.fontColor = [SKColor whiteColor];
+    soundsLabel.fontSize = 30;
+    soundsLabel.text = @"Sounds";
+    soundsLabel.position = CGPointMake(-120, 50);
+    [_settings addChild:soundsLabel];
+    
+    // Load sound setting
+    NSString* soundOn = [_user stringForKey:@"sounds-on"];
+    
+    // Add Sounds on / off button
+    if(soundOn && [soundOn boolValue]){
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-on"]];
+    } else if(soundOn && ![soundOn boolValue]){
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-off"]];
+    } else {
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-on"]];
+    }
+    _sound.position = CGPointMake(0, 60);
+    _sound.name = @"sound";
+    _sound.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_sound.size];
+    [_settings addChild:_sound];
+    
+    // Add Music Label
+    SKLabelNode* musicLabel = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+    musicLabel.fontColor = [SKColor whiteColor];
+    musicLabel.fontSize = 30;
+    musicLabel.text = @"Music";
+    musicLabel.position = CGPointMake(-120, -30);
+    [_settings addChild:musicLabel];
+    
+    // Add Sounds scrollbar
+    _musicScrollBar = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings-scrollbar"]];
+    _musicScrollBar.position = CGPointMake(musicLabel.position.x + 160, musicLabel.position.y + 10);
+    [_settings addChild:_musicScrollBar];
+    
+    // Add Sounds slider
+    _musicSlider = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings-slider"]];
+    _musicSlider.name = @"music";
+    _musicSlider.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_musicSlider.size];
+    _musicSlider.position = CGPointMake((_player.audioPlayer.volume * 186) - 93, 0);
+    [_musicScrollBar addChild:_musicSlider];
+    
+    // Okay button
+    SKSpriteNode* okBtn = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-ok-settings"]];
+    okBtn.position = CGPointMake(0, _musicScrollBar.position.y - 100);
+    okBtn.name = @"okay";
+    [_settings addChild:okBtn];
 }
 
 - (void)didSimulatePhysics{
@@ -793,19 +944,19 @@ CGFloat BALL_SPEED = 400;
 //            [self newBall];
             // Epilogue screen
             // Save data - score
-            NSUserDefaults* epScore = [NSUserDefaults standardUserDefaults];
-            [epScore setObject:[NSString stringWithFormat:@"%d",self.score] forKey:@"epilogue-score"];
+            [_user setObject:[NSString stringWithFormat:@"%d",self.score] forKey:@"epilogue-score"];
+            // Save data - total score
+            [_user setObject:[NSString stringWithFormat:@"%d",self.totalScore] forKey:@"epilogue-total-score"];
             // Save data - time
-            NSUserDefaults* epTime = [NSUserDefaults standardUserDefaults];
-            [epTime setObject:[NSString stringWithFormat:@"%d",self.time] forKey:@"epilogue-time"];
+            [_user setObject:[NSString stringWithFormat:@"%d",self.time] forKey:@"epilogue-time"];
             // Save data - lives
-            NSUserDefaults* epLives = [NSUserDefaults standardUserDefaults];
-            [epLives setObject:[NSString stringWithFormat:@"%d",self.lives] forKey:@"epilogue-lives"];
+            [_user setObject:[NSString stringWithFormat:@"%d",self.lives] forKey:@"epilogue-lives"];
             
             // Save data - current level
-            NSUserDefaults* epLevel = [NSUserDefaults standardUserDefaults];
-            [epLevel setObject:[NSString stringWithFormat:@"%d",self.currentLevel] forKey:@"epilogue-level"];
-            
+            [_user setObject:[NSString stringWithFormat:@"%d",self.currentLevel] forKey:@"epilogue-level"];
+            [_player.audioPlayer stop];
+            _player.isPlaying = NO;
+            _totalScore += self.score;
             SKScene *epilogue = [[Epilogue alloc]initWithSize:self.size];
             [self.view presentScene:epilogue];
         } else if(_ballReleased && !_positioningBall && ![self childNodeWithName:@"ball"]){
@@ -813,22 +964,20 @@ CGFloat BALL_SPEED = 400;
             if(self.lives < 0){
                 // Game over
                 _gameOver = YES;
-                [[GameCenterManager sharedManager]reportScore:self.score];
+                self.currentLevel = 1;
+                _totalScore += self.score;
+                [[GameCenterManager sharedManager]reportScore: _totalScore];
                 [_timer invalidate];
                 // Epilogue screen
                 // Save data - score
-                NSUserDefaults* epScore = [NSUserDefaults standardUserDefaults];
-                [epScore setObject:[NSString stringWithFormat:@"%d",self.score] forKey:@"epilogue-score"];
+                [_user setObject:[NSString stringWithFormat:@"%d",self.score] forKey:@"epilogue-score"];
                 // Save data - time
-                NSUserDefaults* epTime = [NSUserDefaults standardUserDefaults];
-                [epTime setObject:[NSString stringWithFormat:@"%d",self.time] forKey:@"epilogue-time"];
+                [_user setObject:[NSString stringWithFormat:@"%d",self.time] forKey:@"epilogue-time"];
                 // Save data - lives
-                NSUserDefaults* epLives = [NSUserDefaults standardUserDefaults];
-                [epLives setObject:[NSString stringWithFormat:@"%d",self.lives] forKey:@"epilogue-lives"];
+                [_user setObject:[NSString stringWithFormat:@"%d",self.lives] forKey:@"epilogue-lives"];
                 
                 // Save data - current level
-                NSUserDefaults* epLevel = [NSUserDefaults standardUserDefaults];
-                [epLevel setObject:[NSString stringWithFormat:@"%d",self.currentLevel] forKey:@"epilogue-level"];
+                [_user setObject:[NSString stringWithFormat:@"%d",self.currentLevel] forKey:@"epilogue-level"];
                 
                 SKScene *epilogue = [[Epilogue alloc]initWithSize:self.size];
                 [self.view presentScene:epilogue];
@@ -886,7 +1035,7 @@ CGFloat BALL_SPEED = 400;
     if(_canShoot){
         [self createPaddle:BigBang andPosition:position];
     } else {
-        [self createPaddle:BigBang andPosition:position];
+        [self createPaddle:Big andPosition:position];
     }
 }
 

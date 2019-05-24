@@ -11,6 +11,7 @@
 @property (nonatomic) int lives;
 @property (nonatomic) int currentLevel;
 @property (nonatomic) int score;
+@property (nonatomic) int totalScore;
 @property (nonatomic) int time;
 @property (nonatomic) BOOL gamePaused;
 @property (nonatomic) NSMutableArray* powerAnimations;

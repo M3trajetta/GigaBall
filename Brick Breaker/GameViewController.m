@@ -17,15 +17,6 @@
     [super viewDidLoad];
     //authenticate Game Center user if not already
     [[GameCenterManager sharedManager] authenticatePlayer];
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){
-        // Iphone
-        NSLog(@"Iphone detected");
-    } else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        // Ipad
-        NSLog(@"Ipad detected");
-    } else {
-        NSLog(@"Unknown device");
-    }
 }
 
 -(void)viewWillLayoutSubviews {
@@ -39,6 +30,9 @@
         skView.showsDrawCount = YES;
         
         // Create and configure the scene.
+        if(skView.bounds.size.height >= 812){
+            NSLog(@"NEEDS SAFE AREA");
+        }
         Menu *main = [[Menu alloc] initWithSize:skView.bounds.size];
         [skView presentScene: main];
     }
@@ -58,6 +52,11 @@
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
+}
+
+- (void)viewSafeAreaInsetsDidChange{
+    [super viewSafeAreaInsetsDidChange];
+    
 }
 
 @end

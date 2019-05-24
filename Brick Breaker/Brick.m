@@ -42,7 +42,6 @@
         self.physicsBody.dynamic = NO;
         self.type = type;
         self.indistructible = (type == Gray);
-        _brickSmashSound = [SKAction playSoundFileNamed:@"BrickSmash" waitForCompletion:NO];
     }
     return self;
 }
@@ -51,7 +50,6 @@
     switch (self.type) {
         case Green:
             [self createExplosion];
-            [self runAction:_brickSmashSound];
             [self runAction:[SKAction removeFromParent]];
             break;
         case Blue:
@@ -64,7 +62,6 @@
             break;
         case YellowDmg:
             [self createExplosion];
-            [self runAction:_brickSmashSound];
             [self runAction:[SKAction removeFromParent]];
             break;
         default:

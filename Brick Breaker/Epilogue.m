@@ -9,6 +9,7 @@
 #import "Epilogue.h"
 #import "Menu.h"
 #import "GameScene.h"
+#import "AudioPlayer.h"
 
 @implementation Epilogue{
     SKTextureAtlas* _graphics;
@@ -16,10 +17,9 @@
     SKLabelNode* _score;
     SKLabelNode* _lives;
     SKSpriteNode* epilogue;
-}
-
-- (void)didMoveToView:(SKView *)view{
-    
+    int _smallSpace;
+    int _spacing;
+    int _addSizeToFont;
 }
 
 - (instancetype)initWithSize:(CGSize)size{
@@ -33,8 +33,22 @@
         NSString* livesText = [user stringForKey:@"epilogue-lives"];
         // Load data - Score
         NSString* scoreText = [user stringForKey:@"epilogue-score"];
+        // Load data - Score
+        NSString* totalScoreText = [user stringForKey:@"epilogue-score"];
         // Load data - Level
-        NSString* levelText = [user stringForKey:@"epilogue-level"];
+        //NSString* levelText = [user stringForKey:@"epilogue-level"];
+        
+        CGFloat screenWidth = size.width;
+        if(screenWidth > 500 && UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)){
+            _spacing = 50;
+            _smallSpace = 15;
+            NSLog(@"Needs spacing");
+            _addSizeToFont = 20;
+        } else {
+            _spacing = 0;
+            _smallSpace = 0;
+            _addSizeToFont = 0;
+        }
         
         SKSpriteNode* background = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-bg"]];
         background.name = @"background";
@@ -52,62 +66,62 @@
         if ([livesText intValue] < 0) title.text = @"Game Over";
         else title.text = @"Level Cleared";
         
-        title.fontSize = 50;
-        title.position = CGPointMake(0, 120);
+        title.fontSize = 50 + _addSizeToFont;
+        title.position = CGPointMake(0, 120 + _spacing);
         [epilogue addChild:title];
         
         // Time Logo
         SKSpriteNode* timeLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-time"]];
-        timeLogo.position = CGPointMake(-100, 70);
+        timeLogo.position = CGPointMake(-100 - _spacing, 70 + _smallSpace);
         [epilogue addChild:timeLogo];
         
         // Time Label
         _time = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
         _time.fontColor = [SKColor whiteColor];
-        _time.fontSize = 25;
+        _time.fontSize = 25 + _addSizeToFont;
         _time.text = [NSString stringWithFormat:@"%@s", timeText];
-        _time.position = CGPointMake(0, timeLogo.position.y - 10);
+        _time.position = CGPointMake(0, timeLogo.position.y - 10 - _smallSpace);
         [epilogue addChild:_time];
         
         // Lives Logo
         SKSpriteNode* livesLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-lives"]];
-        livesLogo.position = CGPointMake(-100, 0);
+        livesLogo.position = CGPointMake(-100 - _spacing, 0 - _smallSpace);
         [epilogue addChild:livesLogo];
         
         // Lives label
         _lives = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
         _lives.fontColor = [SKColor whiteColor];
-        _lives.fontSize = 25;
+        _lives.fontSize = 25 + _addSizeToFont;
         _lives.text = [NSString stringWithFormat:@"%d", [livesText intValue]+1];
-        _lives.position = CGPointMake(0, livesLogo.position.y - 10);
+        _lives.position = CGPointMake(0, livesLogo.position.y - 10 - _smallSpace);
         [epilogue addChild:_lives];
         
         // Score Logo
         SKSpriteNode* scoreLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-score"]];
-        scoreLogo.position = CGPointMake(-100, -70);
+        scoreLogo.position = CGPointMake(-100 - _spacing, -70 - _smallSpace*2);
         [epilogue addChild:scoreLogo];
         
         // Score label
         _score = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
         _score.fontColor = [SKColor whiteColor];
-        _score.fontSize = 25;
-        _score.text = [NSString stringWithFormat:@"%@", scoreText];
-        _score.position = CGPointMake(0, scoreLogo.position.y - 10);
+        _score.fontSize = 25 + _addSizeToFont;
+        _score.text = [NSString stringWithFormat:@"%@", totalScoreText];
+        _score.position = CGPointMake(0, scoreLogo.position.y - 10 - _smallSpace);
         [epilogue addChild:_score];
         
         SKSpriteNode* btnHome = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-home-menu"]];
-        btnHome.position = CGPointMake(20, -130);
+        btnHome.position = CGPointMake(20, -130 - _spacing - _smallSpace);
         btnHome.name = @"home";
         [epilogue addChild:btnHome];
         
         if ([livesText intValue] < 0){
             SKSpriteNode* btnRestart = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-restart-menu"]];
-            btnRestart.position = CGPointMake(100, -130);
+            btnRestart.position = CGPointMake(100 + _spacing, -130 - _spacing - _smallSpace);
             btnRestart.name = @"restart";
             [epilogue addChild:btnRestart];
         } else {
             SKSpriteNode* btnPlay = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-play-menu"]];
-            btnPlay.position = CGPointMake(100, -130);
+            btnPlay.position = CGPointMake(100 + _spacing, -130 - _spacing - _smallSpace);
             btnPlay.name = @"play";
             [epilogue addChild:btnPlay];
         }
@@ -130,6 +144,9 @@
         }
         if([node.name isEqualToString:@"restart"]){
             // Restart game
+            SKScene *gameScreen = [[GameScene alloc]initWithSize:self.size andLevel: 1];
+            
+            [self.view presentScene:gameScreen];
         }
         if([node.name isEqualToString:@"play"]){
             // Return to game to next level
