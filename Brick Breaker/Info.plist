@@ -24,7 +24,8 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Oswald-Bold.ttf</string>
+		<string>ALBAM___.TTF</string>
+		<string>zorque.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -35,6 +36,7 @@
 		<string>armv7</string>
 		<string>gamekit</string>
 		<string>gamekit</string>
+		<string>gyroscope</string>
 	</array>
 	<key>UIStatusBarHidden</key>
 	<true/>

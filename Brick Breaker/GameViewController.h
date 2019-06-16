@@ -11,5 +11,5 @@
 #import <GameplayKit/GameplayKit.h>
 
 @interface GameViewController : UIViewController
-
+@property (nonatomic) int percentage;
 @end

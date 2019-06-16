@@ -233,7 +233,7 @@
 				<key>brickType</key>
 				<integer>1</integer>
 				<key>powerUp</key>
-				<integer>12</integer>
+				<integer>5</integer>
 			</dict>
 		</array>
 	</array>

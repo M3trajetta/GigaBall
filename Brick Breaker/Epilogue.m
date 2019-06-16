@@ -55,54 +55,45 @@
         background.position = CGPointMake(self.size.width * 0.5, self.size.height * 0.5);
         [self addChild:background];
         
-        epilogue = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-menu-bg"]];
+        
+        if ([livesText intValue] < 0) epilogue = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-menu-bg-go"]];
+        else epilogue = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-menu-bg-lc"]];
         epilogue.position = CGPointMake(self.frame.size.width * 0.5, self.frame.size.height * 0.5);
         [self addChild:epilogue];
         
-        // Title
-        SKLabelNode* title = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-        title.fontColor = [SKColor whiteColor];
-        
-        if ([livesText intValue] < 0) title.text = @"Game Over";
-        else title.text = @"Level Cleared";
-        
-        title.fontSize = 50 + _addSizeToFont;
-        title.position = CGPointMake(0, 120 + _spacing);
-        [epilogue addChild:title];
-        
         // Time Logo
-        SKSpriteNode* timeLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-time"]];
+        SKSpriteNode* timeLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"ep-time"]];
         timeLogo.position = CGPointMake(-100 - _spacing, 70 + _smallSpace);
         [epilogue addChild:timeLogo];
         
         // Time Label
-        _time = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+        _time = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
         _time.fontColor = [SKColor whiteColor];
         _time.fontSize = 25 + _addSizeToFont;
-        _time.text = [NSString stringWithFormat:@"%@s", timeText];
+        _time.text = [NSString stringWithFormat:@"%@ sec", timeText];
         _time.position = CGPointMake(0, timeLogo.position.y - 10 - _smallSpace);
         [epilogue addChild:_time];
         
         // Lives Logo
-        SKSpriteNode* livesLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-lives"]];
+        SKSpriteNode* livesLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"ep-lives"]];
         livesLogo.position = CGPointMake(-100 - _spacing, 0 - _smallSpace);
         [epilogue addChild:livesLogo];
         
         // Lives label
-        _lives = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+        _lives = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
         _lives.fontColor = [SKColor whiteColor];
         _lives.fontSize = 25 + _addSizeToFont;
-        _lives.text = [NSString stringWithFormat:@"%d", [livesText intValue]+1];
+        _lives.text = [NSString stringWithFormat:@"%d", [livesText intValue]+2];
         _lives.position = CGPointMake(0, livesLogo.position.y - 10 - _smallSpace);
         [epilogue addChild:_lives];
         
         // Score Logo
-        SKSpriteNode* scoreLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"epilogue-score"]];
+        SKSpriteNode* scoreLogo = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"ep-score"]];
         scoreLogo.position = CGPointMake(-100 - _spacing, -70 - _smallSpace*2);
         [epilogue addChild:scoreLogo];
         
         // Score label
-        _score = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+        _score = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
         _score.fontColor = [SKColor whiteColor];
         _score.fontSize = 25 + _addSizeToFont;
         _score.text = [NSString stringWithFormat:@"%@", totalScoreText];

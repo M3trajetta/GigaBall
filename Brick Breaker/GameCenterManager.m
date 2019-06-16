@@ -11,6 +11,10 @@
 #import <GameKit/GameKit.h>
 #import <Foundation/Foundation.h>
 #define LEADERBOARD_ID @"gigaball.highscore"
+#define ACHIEVEMENT_FIRST_ID @"first_game"
+#define ACHIEVEMENT_NOVICE_ID @"novice_player"
+#define ACHIEVEMENT_INT_ID @"intermediate_player"
+#define ACHIEVEMENT_EXPERT_ID @"expert_player"
 
 @interface GameCenterManager()
 @property (nonatomic, strong) UIViewController *presentationController;
@@ -77,17 +81,17 @@
             // if the player hit an achievement threshold,
             // create the achievement using the ID and add
             // it to the array
-//            if(score >= 100) {
-//                GKAchievement *noviceAchievement = [[GKAchievement alloc] initWithIdentifier:ACHIEVEMENT_NOVICE_ID];
-//                noviceAchievement.percentComplete = 100;
-//                [achievements addObject:noviceAchievement];
-//            }
+            if(score >= 100) {
+                GKAchievement *noviceAchievement = [[GKAchievement alloc] initWithIdentifier:ACHIEVEMENT_NOVICE_ID];
+                noviceAchievement.percentComplete = 100;
+                [achievements addObject:noviceAchievement];
+            }
 //
-//            if(score >= 150) {
-//                GKAchievement *intAchievement = [[GKAchievement alloc] initWithIdentifier:ACHIEVEMENT_INT_ID];
-//                intAchievement.percentComplete = 100;
-//                [achievements addObject:intAchievement];
-//            }
+            if(score >= 10000) {
+                GKAchievement *intAchievement = [[GKAchievement alloc] initWithIdentifier:ACHIEVEMENT_INT_ID];
+                intAchievement.percentComplete = 100;
+                [achievements addObject:intAchievement];
+            }
 //
 //            if(score >= 200) {
 //                GKAchievement *expertAchievement = [[GKAchievement alloc] initWithIdentifier:ACHIEVEMENT_EXPERT_ID];

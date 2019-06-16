@@ -19,10 +19,8 @@
             break;
         case Energy:
             self = [super initWithTexture:[graphics textureNamed:@"ball-energy"]];
-            break;
-            
-        default:
-            // Normal?
+            self.trail = [self newBallTrail];
+            [self updateTrail];
             break;
     }
     
@@ -44,6 +42,40 @@
     if(self.trail){
         self.trail.position = self.position;
     }
+}
+
+// Create particle effect without file
+-(SKEmitterNode *)newBallTrail
+{
+    //instantiate trail emitter
+    SKEmitterNode *trail = [[SKEmitterNode alloc] init];
+    
+    [trail setParticleTexture:[SKTexture textureWithImageNamed:@"ball-energy"]];
+    [trail setParticleColor:[UIColor cyanColor]];
+    [trail setNumParticlesToEmit:0];
+    [trail setParticleBirthRate:200];
+    [trail setParticleLifetime:0.5];
+    [trail setEmissionAngleRange:360];
+    [trail setParticleSpeed:40];
+    [trail setParticleSpeedRange:0];
+    [trail setXAcceleration:0];
+    [trail setYAcceleration:0];
+    [trail setParticleAlpha:1];
+    [trail setParticleAlphaRange:0.5];
+    [trail setParticleAlphaSpeed:-1];
+    [trail setParticleScale:0.3];
+    [trail setParticleScaleRange:0.3];
+    [trail setParticleScaleSpeed:-0.3];
+    [trail setParticleRotation:0];
+    [trail setParticleRotationRange:360];
+    [trail setParticleRotationSpeed:0];
+    
+    [trail setParticleColorBlendFactor:1];
+    [trail setParticleColorBlendFactorRange:0];
+    [trail setParticleColorBlendFactorSpeed:0];
+    [trail setParticleBlendMode:SKBlendModeAdd];
+    
+    return trail;
 }
 
 - (void)removeFromParent{

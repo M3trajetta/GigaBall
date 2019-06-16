@@ -15,6 +15,7 @@
 #import "Epilogue.h"
 #import "AudioPlayer.h"
 #import "GameCenterManager.h"
+#import "BeforePlay.h"
 
 static const int POWERUPS = 13;
 
@@ -23,16 +24,18 @@ static const int POWERUPS = 13;
     Paddle* _paddle;
     Menu* _menu;
     AudioPlayer* _player;
+    BeforePlay* _beforePlayMenu;
     AVAudioPlayer* _audioPlayer;
     SKSpriteNode* _pause;
     SKSpriteNode* _powerUp;
     SKSpriteNode* _pauseMenu;
     SKSpriteNode* _background;
     SKSpriteNode* _shield;
-    SKSpriteNode* _paddleControl;
     SKSpriteNode* _sound;
     SKSpriteNode* _musicSlider;
     SKSpriteNode* _musicScrollBar;
+    SKSpriteNode* _controlAccelerometer;
+    SKSpriteNode* _controlTouch;
     SKNode* _settings;
     SKNode* _brickLayer;
     CGPoint _touchLocation;
@@ -50,6 +53,7 @@ static const int POWERUPS = 13;
     BOOL _fastBall;
     BOOL _slowBall;
     BOOL _soundOn;
+    BOOL _controlWithAccelerometer;
     NSArray* _hearts;
     SKLabelNode* _levelDisplay;
     SKLabelNode* _scoreDisplay;
@@ -67,6 +71,8 @@ static const int POWERUPS = 13;
     int _spacing;
     int _smallSpace;
     int _addSizeToFont;
+    int _ballCount;
+    CMMotionManager* cmm;
 }
 
 static const int MIN_SPEED_BALL = 200;
@@ -130,7 +136,7 @@ CGFloat BALL_SPEED = 400;
         }
         
         // Score
-        _scoreDisplay = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+        _scoreDisplay = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
         _scoreDisplay.text = @"SCORE 0";
         _scoreDisplay.fontColor = [SKColor whiteColor];
         _scoreDisplay.fontSize = 20;
@@ -162,6 +168,7 @@ CGFloat BALL_SPEED = 400;
         
         // Setting up the brick layer
         _brickLayer = [[SKNode node]init];
+        _brickLayer.name = @"brick-layer";
         _brickLayer.position = CGPointMake(0, self.size.height - 40);
         [self addChild:_brickLayer];
         
@@ -186,6 +193,7 @@ CGFloat BALL_SPEED = 400;
         _shieldCreated = NO;
         _magnetOn = NO;
         _ballIsOnPaddle = NO;
+        _ballCount = 0;
         
         // Load sound setting
         NSString* soundOn = [_user stringForKey:@"sounds-on"];
@@ -204,7 +212,30 @@ CGFloat BALL_SPEED = 400;
         }
         [self loadLevel:self.currentLevel];
         [self newBall];
-        NSLog(@"Total Score: %d", self.totalScore);
+        
+        // Testing variable
+        // YES = control paddle with accellerometer --> real device only
+        // NO = control paddle with touch
+        
+        NSString* savedControlType = [_user stringForKey:@"accelerometer"];
+        if(savedControlType == nil){
+            // if no data found, then default is set to touch controls
+            _controlWithAccelerometer = NO;
+            NSLog(@"NO DATA FOUND. Default used");
+        } else {
+            _controlWithAccelerometer = [[_user stringForKey:@"accelerometer"] boolValue];
+            NSLog(@"DATA FOUND. Accelerometer: %d", _controlWithAccelerometer);
+        }
+        // Core motion
+        cmm = [[CMMotionManager alloc] init];
+        [cmm startDeviceMotionUpdates];
+        cmm.accelerometerUpdateInterval = 0.001;
+        
+        _beforePlayMenu = [[BeforePlay alloc] init];
+        _beforePlayMenu.position = CGPointMake(self.size.width * 0.5, self.size.height * 0.5);
+        [self addChild:_beforePlayMenu];
+        [_beforePlayMenu show];
+        
     }
     return self;
 }
@@ -241,12 +272,6 @@ CGFloat BALL_SPEED = 400;
     _multiplier = 1;
     _paddle.position = CGPointMake(self.size.width * 0.5, 90);
     [self addChild:_paddle];
-    
-    // Control to position the ball
-    _paddleControl = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"paddle-control"]];
-    _paddleControl.position = CGPointMake(0, -40);
-    _paddleControl.alpha = 0.5;
-    [_paddle addChild:_paddleControl];
 
     // Position ball from class
     _ball = [[Ball alloc]initWithType:1];
@@ -291,12 +316,8 @@ CGFloat BALL_SPEED = 400;
     _ball.physicsBody.velocity = velocity;
     [self addChild:_ball];
     if (_ball.type == 2) {
-        NSString* trailPath = [[NSBundle mainBundle] pathForResource:@"BallTrail" ofType:@"sks"];
-        SKEmitterNode* ballTrail = [NSKeyedUnarchiver unarchiveObjectWithFile:trailPath];
-        ballTrail.targetNode = _brickLayer;
-        [self addChild: ballTrail];
-        _ball.trail = ballTrail;
-        [_ball updateTrail];
+        _ball.trail.targetNode = _brickLayer;
+        [self addChild: _ball.trail];
     }
     return _ball;
 }
@@ -501,6 +522,7 @@ CGFloat BALL_SPEED = 400;
         }
         if([secondBody.node.name isEqualToString:@"5"]){
             // Multiball
+            _ballCount++;
             [self multiBallPower:[_brickLayer convertPoint:secondBody.node.position toNode:self] andType:_ball.type];
         }
         if([secondBody.node.name isEqualToString:@"6"]){
@@ -560,13 +582,13 @@ CGFloat BALL_SPEED = 400;
     
     // Contact between ball and bottom of screen
     if (firstBody.categoryBitMask == ballCategory && secondBody.categoryBitMask == bottomCategory) {
-        // For some reason this function is called twice
+        NSLog(@"Inside the contact");
         if(firstBody.node){
-            // TODO: Bug - Multiball takes life
-            self.lives--;
+            if(_ballCount > 0) _ballCount--;
+            else self.lives--;
+            [firstBody.node removeFromParent];
+            if(self.lives <= 0) self->_gameOver = YES;
         }
-        [firstBody.node removeFromParent];
-        if(self.lives <= 0) self->_gameOver = YES;
     }
     
     // Contact between ball and shield
@@ -684,19 +706,20 @@ CGFloat BALL_SPEED = 400;
     _pauseMenu.position = CGPointMake(self.size.width * 0.5, self.size.height * 0.5);
     [self addChild:_pauseMenu];
     
-    _levelDisplay = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
+    _levelDisplay = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
     _levelDisplay.fontColor = [SKColor whiteColor];
     _levelDisplay.text = [NSString stringWithFormat:@"Level %d", self.currentLevel];
-    _levelDisplay.fontSize = 30 + _addSizeToFont;
-    _levelDisplay.position = CGPointMake(-60 - _spacing, 60);
+    _levelDisplay.fontSize = 20 + _addSizeToFont;
+    _levelDisplay.position = CGPointMake(-75 - _spacing, 50);
     [_pauseMenu addChild:_levelDisplay];
     
+    
     // Time
-    _timeDisplay = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    _timeDisplay.text = [NSString stringWithFormat:@"Time %ds", self.time];
+    _timeDisplay = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
+    _timeDisplay.text = [NSString stringWithFormat:@"Time %d sec", self.time];
     _timeDisplay.fontColor = [SKColor whiteColor];
-    _timeDisplay.fontSize = 30 + _addSizeToFont;
-    _timeDisplay.position = CGPointMake(50 + _spacing, 60);
+    _timeDisplay.fontSize = 20 + _addSizeToFont;
+    _timeDisplay.position = CGPointMake(75 + _spacing, 50);
     [_pauseMenu addChild:_timeDisplay];
     
     SKSpriteNode* btnHome = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-home"]];
@@ -716,6 +739,7 @@ CGFloat BALL_SPEED = 400;
     
     SKSpriteNode* btnContinue = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-continue"]];
     btnContinue.name = @"continue";
+    btnContinue.size = CGSizeMake(btnContinue.size.width * 0.75, btnContinue.size.height * 0.75);
     btnContinue.position = CGPointMake(0, -100 - _spacing * 2 + _smallSpace);
     [_pauseMenu addChild:btnContinue];
     
@@ -725,126 +749,155 @@ CGFloat BALL_SPEED = 400;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     for (UITouch *touch in touches) {
-        if(!_ballReleased){
-            _positioningBall = YES;
+        if (_beforePlayMenu.hidden) {
+            if(!_ballReleased){
+                _positioningBall = YES;
+            }
+            
+            if(_canShoot){
+                [self shootBangPower];
+            }
+            SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
+            if([node.name isEqualToString:@"music"]){
+                _touchLocationMusic = [touch locationInNode:self];
+            }
+            if([node.name isEqualToString:@"sounds"]){
+                _touchLocationSound = [touch locationInNode:self];
+            }
         }
         _touchLocation = [touch locationInNode:self];
-        if(_canShoot){
-            [self shootBangPower];
-        }
-        SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
-        if([node.name isEqualToString:@"music"]){
-            _touchLocationMusic = [touch locationInNode:self];
-        }
-        if([node.name isEqualToString:@"sounds"]){
-            _touchLocationSound = [touch locationInNode:self];
-        }
     }
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     CGFloat minX = -_musicScrollBar.size.width * 0.5;
     CGFloat maxX = _musicScrollBar.size.width * 0.5;
-    for (UITouch *touch in touches) {
-        SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
-        if(!self.paused){
-            // Calculate how far the touch moved
-            CGFloat xMovement = [touch locationInNode:self].x - _touchLocation.x;
-        
-            // Move paddle distance of touch
-            _paddle.position = CGPointMake(_paddle.position.x + xMovement, _paddle.position.y);
-            CGFloat paddleMinX = -_paddle.size.width * 0.25 ;
-            CGFloat paddleMaxX = self.size.width + (_paddle.size.width * 0.25);
-        
-            if(_positioningBall){
-                paddleMinX = _paddle.size.width * 0.5;
-                paddleMaxX = self.size.width - _paddle.size.width * 0.5;
+    if(_beforePlayMenu.hidden){
+        for (UITouch *touch in touches) {
+            SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
+            if(!self.paused && !_controlWithAccelerometer){
+                // Calculate how far the touch moved
+                CGFloat xMovement = [touch locationInNode:self].x - _touchLocation.x;
+            
+                // Move paddle distance of touch
+                _paddle.position = CGPointMake(_paddle.position.x + xMovement, _paddle.position.y);
+                CGFloat paddleMinX = -_paddle.size.width * 0.25 ;
+                CGFloat paddleMaxX = self.size.width + (_paddle.size.width * 0.25);
+            
+                if(_positioningBall){
+                    paddleMinX = _paddle.size.width * 0.5;
+                    paddleMaxX = self.size.width - _paddle.size.width * 0.5;
+                }
+            
+                // Cap paddle's position so it remains on the screen
+                if(_paddle.position.x < paddleMinX) { _paddle.position = CGPointMake(paddleMinX, _paddle.position.y); }
+                if(_paddle.position.x > paddleMaxX) { _paddle.position = CGPointMake(paddleMaxX, _paddle.position.y); }
+                _touchLocation = [touch locationInNode:self];
             }
-        
-            // Cap paddle's position so it remains on the screen
-            if(_paddle.position.x < paddleMinX) { _paddle.position = CGPointMake(paddleMinX, _paddle.position.y); }
-            if(_paddle.position.x > paddleMaxX) { _paddle.position = CGPointMake(paddleMaxX, _paddle.position.y); }
-            _touchLocation = [touch locationInNode:self];
-        }
-        if([node.name isEqualToString:@"music"]){
-            // Calculate how far the touch moved
-            CGFloat xMovementMusic = [touch locationInNode:self].x - _touchLocationMusic.x;
-            // Move paddle distance of touch
-            _musicSlider.position = CGPointMake(_musicSlider.position.x + xMovementMusic, _musicSlider.position.y);
-            // Cap music slider position so it remains on the screen
-            if(_musicSlider.position.x < minX) { _musicSlider.position = CGPointMake(minX, _musicSlider.position.y); }
-            if(_musicSlider.position.x > maxX) { _musicSlider.position = CGPointMake(maxX, _musicSlider.position.y); }
-            _touchLocationMusic = [touch locationInNode:self];
-            _player.audioPlayer.volume = (_musicSlider.position.x + 93) / 186;
-            if(_player.audioPlayer.volume == 0){
-                _musicSlider.texture = [SKTexture textureWithImageNamed:@"music-off"];
-            } else {
-                _musicSlider.texture = [SKTexture textureWithImageNamed:@"settings-slider"];
+            if([node.name isEqualToString:@"music"]){
+                // Calculate how far the touch moved
+                CGFloat xMovementMusic = [touch locationInNode:self].x - _touchLocationMusic.x;
+                // Move paddle distance of touch
+                _musicSlider.position = CGPointMake(_musicSlider.position.x + xMovementMusic, _musicSlider.position.y);
+                // Cap music slider position so it remains on the screen
+                if(_musicSlider.position.x < minX) { _musicSlider.position = CGPointMake(minX, _musicSlider.position.y); }
+                if(_musicSlider.position.x > maxX) { _musicSlider.position = CGPointMake(maxX, _musicSlider.position.y); }
+                _touchLocationMusic = [touch locationInNode:self];
+                _player.audioPlayer.volume = (_musicSlider.position.x + 93) / 186;
+                [_user setObject:[NSString stringWithFormat:@"%f",_player.audioPlayer.volume] forKey:@"volume"];
+                if(_player.audioPlayer.volume == 0){
+                    _musicSlider.texture = [SKTexture textureWithImageNamed:@"music_off"];
+                } else {
+                    _musicSlider.texture = [SKTexture textureWithImageNamed:@"music_slider"];
+                }
             }
         }
     }
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
-    for (UITouch *t in touches) {
-        if(_positioningBall){
-            _positioningBall = NO;
-            _ballReleased = YES;
-            _ballIsOnPaddle = NO;
-            [_paddle removeAllChildren];
-            [self createBallWithLocation:CGPointMake(_paddle.position.x, _paddle.position.y + _paddle.size.height) andVelocity:CGVectorMake(0, BALL_SPEED) andType:_ball.type];
-        }
-        if(!self.gamePaused){
-            if([_pause containsPoint:[t locationInNode:_pause.parent]]){
-                self.gamePaused = YES;
-                [self showMenu];
+    if(_beforePlayMenu.hidden){
+        for (UITouch *t in touches) {
+            if(_positioningBall){
+                _positioningBall = NO;
+                _ballReleased = YES;
+                _ballIsOnPaddle = NO;
+                [_paddle removeAllChildren];
+                [self createBallWithLocation:CGPointMake(_paddle.position.x, _paddle.position.y + _paddle.size.height) andVelocity:CGVectorMake(0, BALL_SPEED) andType:_ball.type];
             }
-        } else {
-            _pauseMenu = (SKSpriteNode*)[self childNodeWithName: @"_pauseMenu"];
-            SKNode* node = [self nodeAtPoint: [t locationInNode:self]];
-            if([node.name isEqualToString:@"home"]){
-                // Go to main screen
-                SKScene *homeScene = [[Menu alloc]initWithSize:self.size];
-                _player.isPlaying = NO;
-                [_player.audioPlayer stop];
-                [self.view presentScene:homeScene];
-            }
-            if([node.name isEqualToString:@"restart"]){
-                // Restart level
-                _background.texture = [SKTexture textureWithImageNamed:@"bg-game"];
-                // TODO: Bug found - fix gameover situation if ball not released
-                NSLog(@"Restart");
-                self.score = 0;
-                [self loadLevel:self.currentLevel];
-                [self newBall];
-                self.gamePaused = NO;
-                self.time = 0;
-            }
-            if([node.name isEqualToString:@"settings"]){
-                // Show settings menu
-                NSLog(@"Settings");
-                [_pauseMenu removeFromParent];
-                [self showSettings];
-            }
-            if([node.name isEqualToString:@"continue"]){
-                // Continue Game
-                _background.texture = [SKTexture textureWithImageNamed:@"bg-game"];
-                [_pauseMenu removeFromParent];
-                self.gamePaused = NO;
-            }
-            if([node.name isEqualToString:@"sound"]){
-                _soundOn = !_soundOn;
-                [_user setObject:[NSString stringWithFormat:@"%d",_soundOn] forKey:@"sounds-on"];
-                if (_soundOn) {
-                    _sound.texture = [SKTexture textureWithImageNamed:@"sound-on"];
-                } else {
-                    _sound.texture = [SKTexture textureWithImageNamed:@"sound-off"];
+            if(!self.gamePaused){
+                if([_pause containsPoint:[t locationInNode:_pause.parent]]){
+                    self.gamePaused = YES;
+                    [self showMenu];
+                }
+            } else {
+                _pauseMenu = (SKSpriteNode*)[self childNodeWithName: @"_pauseMenu"];
+                SKNode* node = [self nodeAtPoint: [t locationInNode:self]];
+                if([node.name isEqualToString:@"home"]){
+                    // Go to main screen
+                    SKScene *homeScene = [[Menu alloc]initWithSize:self.size];
+                    _player.isPlaying = NO;
+                    [_player.audioPlayer stop];
+                    [self.view presentScene:homeScene];
+                }
+                if([node.name isEqualToString:@"restart"]){
+                    // Restart level
+                    _background.texture = [SKTexture textureWithImageNamed:@"bg-game"];
+                    // TODO: Bug found - fix gameover situation if ball not released
+                    NSLog(@"Restart");
+                    self.score = 0;
+                    [self loadLevel:self.currentLevel];
+                    [self newBall];
+                    self.gamePaused = NO;
+                    self.time = 0;
+                }
+                if([node.name isEqualToString:@"settings"]){
+                    // Show settings menu
+                    [_pauseMenu removeFromParent];
+                    [self showSettings];
+                }
+                if([node.name isEqualToString:@"continue"]){
+                    // Continue Game
+                    _background.texture = [SKTexture textureWithImageNamed:@"bg-game"];
+                    [_pauseMenu removeFromParent];
+                    self.gamePaused = NO;
+                }
+                if([node.name isEqualToString:@"sound"]){
+                    _soundOn = !_soundOn;
+                    // Save sound preference
+                    [_user setObject:[NSString stringWithFormat:@"%d",_soundOn] forKey:@"sounds-on"];
+                    if (_soundOn) {
+                        _sound.texture = [SKTexture textureWithImageNamed:@"sound_on"];
+                    } else {
+                        _sound.texture = [SKTexture textureWithImageNamed:@"sound_off"];
+                    }
+                }
+                if([node.name isEqualToString:@"back"]){
+                    _background.texture = [SKTexture textureWithImageNamed:@"bg-game"];
+                    [_settings removeFromParent];
+                    _gamePaused = NO;
+                    self.paused = NO;
+                }
+                if([node.name isEqualToString:@"touch_control"]){
+                    _controlWithAccelerometer = NO;
+                    [_user setObject:[NSString stringWithFormat:@"%d",_controlWithAccelerometer] forKey:@"accelerometer"];
+                    _controlTouch.texture = [SKTexture textureWithImageNamed:@"settings_touch"];
+                    _controlAccelerometer.texture = [SKTexture textureWithImageNamed:@"settings_accelerometer_disabled"];
+                    
+                }
+                if([node.name isEqualToString:@"accelerometer_control"]){
+                    _controlWithAccelerometer = YES;
+                    [_user setObject:[NSString stringWithFormat:@"%d",_controlWithAccelerometer] forKey:@"accelerometer"];
+                    _controlAccelerometer.texture = [SKTexture textureWithImageNamed:@"settings_accelerometer"];
+                    _controlTouch.texture = [SKTexture textureWithImageNamed:@"settings_touch_disabled"];
                 }
             }
-            if([node.name isEqualToString:@"okay"]){
-                [_settings removeFromParent];
-                [self showMenu];
+        }
+    } else {
+        for (UITouch *touch in touches) {
+            if([[_beforePlayMenu nodeAtPoint: [touch locationInNode:_beforePlayMenu]].name isEqualToString:@"before"]){
+                NSLog(@"Before Play");
+                [_beforePlayMenu hide];
             }
         }
     }
@@ -862,62 +915,90 @@ CGFloat BALL_SPEED = 400;
     [_settings addChild:settings];
     
     // Add title for the box
-    SKLabelNode* title = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    title.fontColor = [SKColor whiteColor];
-    title.fontSize = 50;
-    title.text = @"Settings";
-    title.position = CGPointMake(0, 120);
-    [_settings addChild:title];
+    SKSpriteNode* settingsLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_label"]];
+    settingsLabel.position = CGPointMake(0, 160 + _spacing);
+    [_settings addChild:settingsLabel];
     
     // Add Sounds Label
-    SKLabelNode* soundsLabel = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    soundsLabel.fontColor = [SKColor whiteColor];
-    soundsLabel.fontSize = 30;
-    soundsLabel.text = @"Sounds";
-    soundsLabel.position = CGPointMake(-120, 50);
+    SKSpriteNode* soundsLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_label"]];
+    soundsLabel.position = CGPointMake(-120 - _spacing, 80);
     [_settings addChild:soundsLabel];
     
     // Load sound setting
-    NSString* soundOn = [_user stringForKey:@"sounds-on"];
+    NSUserDefaults* user = [NSUserDefaults standardUserDefaults];
+    NSString* soundOn = [user stringForKey:@"sounds_on"];
     
     // Add Sounds on / off button
     if(soundOn && [soundOn boolValue]){
-        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-on"]];
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_on"]];
     } else if(soundOn && ![soundOn boolValue]){
-        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-off"]];
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_off"]];
     } else {
-        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-on"]];
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_on"]];
     }
-    _sound.position = CGPointMake(0, 60);
+    _sound.position = CGPointMake(50 + _spacing, 80);
     _sound.name = @"sound";
-    _sound.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_sound.size];
     [_settings addChild:_sound];
     
     // Add Music Label
-    SKLabelNode* musicLabel = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    musicLabel.fontColor = [SKColor whiteColor];
-    musicLabel.fontSize = 30;
-    musicLabel.text = @"Music";
-    musicLabel.position = CGPointMake(-120, -30);
+    SKSpriteNode* musicLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"music_label"]];
+    musicLabel.position = CGPointMake(-130 - _spacing, 0);
     [_settings addChild:musicLabel];
     
     // Add Sounds scrollbar
     _musicScrollBar = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings-scrollbar"]];
-    _musicScrollBar.position = CGPointMake(musicLabel.position.x + 160, musicLabel.position.y + 10);
+    _musicScrollBar.position = CGPointMake(musicLabel.position.x + 180 + _spacing, musicLabel.position.y + 10);
     [_settings addChild:_musicScrollBar];
     
     // Add Sounds slider
-    _musicSlider = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings-slider"]];
+    _musicSlider = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"music_slider"]];
     _musicSlider.name = @"music";
     _musicSlider.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_musicSlider.size];
     _musicSlider.position = CGPointMake((_player.audioPlayer.volume * 186) - 93, 0);
     [_musicScrollBar addChild:_musicSlider];
     
+    // Add Controls Label
+    SKSpriteNode* controlsLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"controls_label"]];
+    controlsLabel.position = CGPointMake(-110 - _spacing, -80);
+    [_settings addChild:controlsLabel];
+    
+    // Check if there are saved data for accelerometer
+    NSString* savedControlType = [_user stringForKey:@"accelerometer"];
+    if(savedControlType == nil){
+        // if no data found, then default is set to touch controls
+        _controlWithAccelerometer = NO;
+        NSLog(@"NO DATA FOUND. Default used");
+    } else {
+        _controlWithAccelerometer = [[_user stringForKey:@"accelerometer"] boolValue];
+        NSLog(@"DATA FOUND. Accelerometer: %d", _controlWithAccelerometer);
+    }
+    
+    // Add accelerometer icon based on saved or default data
+    if(_controlWithAccelerometer == YES) _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer"]];
+    else _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer_disabled"]];
+    
+    _controlAccelerometer.position = CGPointMake(controlsLabel.position.x + 120, controlsLabel.position.y);
+    _controlAccelerometer.name = @"accelerometer_control";
+    [_settings addChild:_controlAccelerometer];
+    
+    // Add touch icon based on saved or default data
+    if(_controlWithAccelerometer == YES) _controlTouch = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_touch_disabled"]];
+    else _controlTouch = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_touch"]];
+    
+    _controlTouch.position = CGPointMake(_controlAccelerometer.position.x + _controlAccelerometer.size.width * 0.5 + 60, _controlAccelerometer.position.y);
+    _controlTouch.name = @"touch_control";
+    [_settings addChild:_controlTouch];
+    
+    if([cmm isAccelerometerAvailable] == NO){
+        // Enable choice of controls
+        _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer_disabled"]];
+    }
+    
     // Okay button
-    SKSpriteNode* okBtn = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-ok-settings"]];
-    okBtn.position = CGPointMake(0, _musicScrollBar.position.y - 100);
-    okBtn.name = @"okay";
-    [_settings addChild:okBtn];
+    SKSpriteNode* backBtn = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-back-settings"]];
+    backBtn.position = CGPointMake(0, -160 - _spacing);
+    backBtn.name = @"back";
+    [_settings addChild:backBtn];
 }
 
 - (void)didSimulatePhysics{
@@ -930,18 +1011,16 @@ CGFloat BALL_SPEED = 400;
 
 -(void)update:(CFTimeInterval)currentTime {
     // Called before each frame is rendered
-    if (_gamePaused) {
+    if (_gamePaused && _beforePlayMenu.hidden) {
         self.paused = YES;
         [self showMenu];
         _menuCreated = YES;
     }
-    else if (!_gamePaused) {
+    else {
         self.paused = NO;
         if([self isLevelComplete]){
-//            self.currentLevel++;
             if(_soundOn) [self runAction:_levelUpSound];
-//            [self loadLevel:self.currentLevel];
-//            [self newBall];
+            _totalScore += self.score;
             // Epilogue screen
             // Save data - score
             [_user setObject:[NSString stringWithFormat:@"%d",self.score] forKey:@"epilogue-score"];
@@ -956,7 +1035,6 @@ CGFloat BALL_SPEED = 400;
             [_user setObject:[NSString stringWithFormat:@"%d",self.currentLevel] forKey:@"epilogue-level"];
             [_player.audioPlayer stop];
             _player.isPlaying = NO;
-            _totalScore += self.score;
             SKScene *epilogue = [[Epilogue alloc]initWithSize:self.size];
             [self.view presentScene:epilogue];
         } else if(_ballReleased && !_positioningBall && ![self childNodeWithName:@"ball"]){
@@ -983,6 +1061,21 @@ CGFloat BALL_SPEED = 400;
                 [self.view presentScene:epilogue];
             }
             [self newBall];
+        } else if(_controlWithAccelerometer){
+            // Move paddle distance with accelerometer
+            _paddle.position = CGPointMake(_paddle.position.x, _paddle.position.y);
+            CGFloat paddleMinX = -_paddle.size.width * 0.25 ;
+            CGFloat paddleMaxX = self.size.width + (_paddle.size.width * 0.25);
+            
+            if(_positioningBall){
+                paddleMinX = _paddle.size.width * 0.5;
+                paddleMaxX = self.size.width - _paddle.size.width * 0.5;
+            }
+            
+            CMDeviceMotion* cdm = cmm.deviceMotion;
+            _paddle.position = CGPointMake(_paddle.position.x + cdm.attitude.roll*20, _paddle.position.y);
+            if(_paddle.position.x > paddleMaxX) { _paddle.position = CGPointMake(paddleMaxX, _paddle.position.y); }
+            if(_paddle.position.x < paddleMinX) { _paddle.position = CGPointMake(paddleMinX, _paddle.position.y); }
         }
     }
 }

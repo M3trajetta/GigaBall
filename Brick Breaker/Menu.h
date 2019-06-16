@@ -7,6 +7,8 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
+#import <UIKit/UIKit.h>
+#import <CoreMotion/CoreMotion.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

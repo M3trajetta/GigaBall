@@ -12,6 +12,8 @@
 #import "GameCenterManager.h"
 #import "AudioPlayer.h"
 #import "Epilogue.h"
+#import "Help.h"
+#import "HelpViewController.h"
 
 @implementation Menu{
     SKTextureAtlas* _graphics;
@@ -20,36 +22,30 @@
     SKNode* _foreground;
     SKNode* _settings;
     SKSpriteNode* _playButton;
+    SKSpriteNode* _optionsButton;
+    SKSpriteNode* _scoresButton;
+    SKSpriteNode* _helpButton;
     SKSpriteNode* _sound;
     SKSpriteNode* _musicSlider;
     SKSpriteNode* _musicScrollBar;
+    SKSpriteNode* _controlAccelerometer;
+    SKSpriteNode* _controlTouch;
+    SKSpriteNode* _backBtn;
     BOOL _soundOn;
     BOOL _safeArea;
+    BOOL _controlWithAccelerometer;
     AudioPlayer* _player;
     NSUserDefaults* _user;
     int _spacing;
     int _addSizeToFont;
+    CMMotionManager* cmm;
 }
 
 - (void)didMoveToView:(SKView *)view{
+    //authenticate Game Center user if not already
+    [[GameCenterManager sharedManager] authenticatePlayer];
     _graphics = [SKTextureAtlas atlasNamed:@"Graphics"];
     self.physicsWorld.gravity = CGVectorMake(0.0, 0.0);
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    CGFloat width = CGRectGetWidth(self.view.bounds);
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){
-        // Iphone
-        NSLog(@"Iphone detected: %f", width);
-        if (screenSize.height >= 812){
-            // Safe area
-        }
-    } else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
-        // Ipad
-        NSLog(@"Ipad detected: %f", width);
-
-    } else {
-        NSLog(@"Unknown device");
-    }
-    
     
     CGFloat screenWidth = CGRectGetWidth(self.view.bounds);
     // Check if screen width is greater than 500 and orientation of the device is portrait
@@ -113,52 +109,53 @@
     [_playButton runAction:animatePlayButton];
     
     // Options button
-    SKSpriteNode* optionsButton = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-options"]];
-    optionsButton.name = @"options";
-    optionsButton.position = CGPointMake(_playButton.position.x, _playButton.position.y - 80 - _spacing);
-    [_foreground addChild: optionsButton];
+    _optionsButton = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-options"]];
+    _optionsButton.name = @"options";
+    _optionsButton.position = CGPointMake(_playButton.position.x, _playButton.position.y - 90 - _spacing);
+    [_foreground addChild: _optionsButton];
     
     // Animate Options button
-    optionsButton.alpha = 0;
+    _optionsButton.alpha = 0;
     SKAction* animateOptionsButton = [SKAction group:@[[SKAction moveToX:posX duration:1.3],
                                                     [SKAction fadeInWithDuration:1.6]]];
     animateOptionsButton.timingMode = SKActionTimingEaseOut;
-    [optionsButton runAction:animateOptionsButton];
+    [_optionsButton runAction:animateOptionsButton];
     
     // Score button
-    SKSpriteNode* scoresButton = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-scores"]];
-    scoresButton.name = @"scores";
-    scoresButton.position = CGPointMake(optionsButton.position.x, optionsButton.position.y - 80 - _spacing);
-    [_foreground addChild: scoresButton];
+    _scoresButton = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-scores"]];
+    _scoresButton.name = @"scores";
+    _scoresButton.position = CGPointMake(_optionsButton.position.x, _optionsButton.position.y - 90 - _spacing);
+    [_foreground addChild: _scoresButton];
     
     // Animate Score button
-    scoresButton.alpha = 0;
+    _scoresButton.alpha = 0;
     SKAction* animateScoreButton = [SKAction group:@[[SKAction moveToX:posX duration:1.6],
                                                        [SKAction fadeInWithDuration:1.9]]];
     animateScoreButton.timingMode = SKActionTimingEaseOut;
-    [scoresButton runAction:animateScoreButton];
+    [_scoresButton runAction:animateScoreButton];
     
     // Credit button
-    SKSpriteNode* helpButton = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-help"]];
-    helpButton.name = @"help";
-    helpButton.position = CGPointMake(scoresButton.position.x, scoresButton.position.y - 80 - _spacing);
-    [_foreground addChild: helpButton];
+     _helpButton = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-help"]];
+    _helpButton.name = @"help";
+    _helpButton.position = CGPointMake(_scoresButton.position.x, _scoresButton.position.y - 90 - _spacing);
+    [_foreground addChild: _helpButton];
     
     // Animate Credit button
-    helpButton.alpha = 0;
-    SKAction* animateHelpButton = [SKAction group:@[[SKAction moveToX:posX duration:1.9],
+    _helpButton.alpha = 0;
+    SKAction* animate_helpButton = [SKAction group:@[[SKAction moveToX:posX duration:1.9],
                                                      [SKAction fadeInWithDuration:2.1]]];
-    animateHelpButton.timingMode = SKActionTimingEaseOut;
-    [helpButton runAction:animateHelpButton];
+    animate_helpButton.timingMode = SKActionTimingEaseOut;
+    [_helpButton runAction:animate_helpButton];
     
+    // Core motion
+    cmm = [[CMMotionManager alloc] init];
+    [cmm startDeviceMotionUpdates];
+    cmm.accelerometerUpdateInterval = 1.0 / 60.0;
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     for (UITouch *touch in touches) {
         SKNode* node = [self nodeAtPoint: [touch locationInNode:self]];
-        if([node.name isEqualToString:@"play"]){
-            _playButton.texture = [SKTexture textureWithImageNamed:@"btn-play-pressed"];
-        }
         if([node.name isEqualToString:@"music"]){
             _touchLocationMusic = [touch locationInNode:self];
         }
@@ -186,9 +183,9 @@
             _player.audioPlayer.volume = (_musicSlider.position.x + 93) / 186;
             [_user setObject:[NSString stringWithFormat:@"%f",_player.audioPlayer.volume] forKey:@"volume"];
             if(_player.audioPlayer.volume == 0){
-                _musicSlider.texture = [SKTexture textureWithImageNamed:@"music-off"];
+                _musicSlider.texture = [SKTexture textureWithImageNamed:@"music_off"];
             } else {
-                _musicSlider.texture = [SKTexture textureWithImageNamed:@"settings-slider"];
+                _musicSlider.texture = [SKTexture textureWithImageNamed:@"music_slider"];
             }
         }
     }
@@ -197,44 +194,70 @@
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{    
     for (UITouch *t in touches) {
         SKNode* node = [self nodeAtPoint: [t locationInNode:self]];
+        SKAction* buttonClick = [SKAction sequence:@[[SKAction scaleTo:1.2 duration:0.1], [SKAction scaleTo:1.0 duration:0.1]]];
         if([node.name isEqualToString:@"play"]){
-            _playButton.texture = [SKTexture textureWithImageNamed:@"btn-play"];
-            NSUserDefaults* epLevel = [NSUserDefaults standardUserDefaults];
-            int levelSaved = [[epLevel stringForKey:@"epilogue-level"] intValue];
-            _player.isPlaying = NO;
-            [_player.audioPlayer stop];
-            SKTransition *reveal = [SKTransition fadeWithColor:[SKColor whiteColor] duration:1.0];
-            if(levelSaved){
-                SKScene *gameScene = [[GameScene alloc]initWithSize:self.size andLevel:levelSaved];
-                [self.view presentScene:gameScene transition:reveal];
-            } else{
-                SKScene *gameScene = [[GameScene alloc]initWithSize:self.size andLevel:1];
-                [self.view presentScene:gameScene transition:reveal];
-            }
+            [_playButton runAction:buttonClick completion:^{
+                NSUserDefaults* epLevel = [NSUserDefaults standardUserDefaults];
+                int levelSaved = [[epLevel stringForKey:@"epilogue-level"] intValue];
+                self->_player.isPlaying = NO;
+                [self->_player.audioPlayer stop];
+                SKTransition *reveal = [SKTransition fadeWithColor:[SKColor whiteColor] duration:1.0];
+                if(levelSaved){
+                    SKScene *gameScene = [[GameScene alloc]initWithSize:self.size andLevel:levelSaved];
+                    [self.view presentScene:gameScene transition:reveal];
+                } else{
+                    SKScene *gameScene = [[GameScene alloc]initWithSize:self.size andLevel:1];
+                    [self.view presentScene:gameScene transition:reveal];
+                }
+            }];
         }
         if([node.name isEqualToString:@"options"]){
-            _foreground.hidden = YES;
-            [self showOptions];
+            [_optionsButton runAction:buttonClick completion:^{
+                    self->_foreground.hidden = YES;
+                    [self showOptions];
+            }];
         }
         if([node.name isEqualToString:@"scores"]){
-            [[GameCenterManager sharedManager]showLeaderboard];
+            [_scoresButton runAction:buttonClick completion:^{
+                [[GameCenterManager sharedManager]showLeaderboard];
+            }];
         }
         if([node.name isEqualToString:@"help"]){
-            NSLog(@"Help");
+            [_helpButton runAction:buttonClick completion:^{
+                // Create and configure the scene.
+                SKScene *scene = [[Help alloc] initWithSize:self.view.frame.size];
+                scene.scaleMode = SKSceneScaleModeAspectFit;
+                
+                // Present the scene.
+                [self.view presentScene:scene];
+            }];
         }
         if([node.name isEqualToString:@"sound"]){
             _soundOn = !_soundOn;
             // Save sound preference
             [_user setObject:[NSString stringWithFormat:@"%d",_soundOn] forKey:@"sounds-on"];
-            if (_soundOn) {
-                _sound.texture = [SKTexture textureWithImageNamed:@"sound-on"];
-            } else {
-                _sound.texture = [SKTexture textureWithImageNamed:@"sound-off"];
-            }
+            if (_soundOn) _sound.texture = [SKTexture textureWithImageNamed:@"sound_on"];
+            else _sound.texture = [SKTexture textureWithImageNamed:@"sound_off"];
         }
-        if([node.name isEqualToString:@"okay"]){
-            [_settings removeFromParent];
-            _foreground.hidden = NO;
+        if([node.name isEqualToString:@"back"]){
+            [_backBtn runAction:buttonClick completion:^{
+                [self->_settings removeFromParent];
+                self->_foreground.hidden = NO;
+            }];
+            
+        }
+        if([node.name isEqualToString:@"touch_control"]){
+            _controlWithAccelerometer = NO;
+            [_user setObject:[NSString stringWithFormat:@"%d",_controlWithAccelerometer] forKey:@"accelerometer"];
+            _controlTouch.texture = [SKTexture textureWithImageNamed:@"settings_touch"];
+            _controlAccelerometer.texture = [SKTexture textureWithImageNamed:@"settings_accelerometer_disabled"];
+            
+        }
+        if([node.name isEqualToString:@"accelerometer_control"]){
+            _controlWithAccelerometer = YES;
+            [_user setObject:[NSString stringWithFormat:@"%d",_controlWithAccelerometer] forKey:@"accelerometer"];
+            _controlAccelerometer.texture = [SKTexture textureWithImageNamed:@"settings_accelerometer"];
+            _controlTouch.texture = [SKTexture textureWithImageNamed:@"settings_touch_disabled"];
         }
     }
 }
@@ -251,44 +274,34 @@
     [_settings addChild:settings];
     
     // Add title for the box
-    SKLabelNode* title = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    title.fontColor = [SKColor whiteColor];
-    title.fontSize = 50 + _addSizeToFont;
-    title.text = @"Settings";
-    title.position = CGPointMake(0, 120 + _spacing);
-    [_settings addChild:title];
+    SKSpriteNode* settingsLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_label"]];
+    settingsLabel.position = CGPointMake(0, 160 + _spacing);
+    [_settings addChild:settingsLabel];
     
     // Add Sounds Label
-    SKLabelNode* soundsLabel = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    soundsLabel.fontColor = [SKColor whiteColor];
-    soundsLabel.fontSize = 30 + _addSizeToFont;
-    soundsLabel.text = @"Sounds";
-    soundsLabel.position = CGPointMake(-120 - _spacing, 50);
+    SKSpriteNode* soundsLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_label"]];
+    soundsLabel.position = CGPointMake(-120 - _spacing, 80);
     [_settings addChild:soundsLabel];
     
     // Load sound setting
     NSUserDefaults* user = [NSUserDefaults standardUserDefaults];
-    NSString* soundOn = [user stringForKey:@"sounds-on"];
+    NSString* soundOn = [user stringForKey:@"sounds_on"];
     
     // Add Sounds on / off button
     if(soundOn && [soundOn boolValue]){
-        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-on"]];
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_on"]];
     } else if(soundOn && ![soundOn boolValue]){
-        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-off"]];
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_off"]];
     } else {
-        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound-on"]];
+        _sound = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"sound_on"]];
     }
-    _sound.position = CGPointMake(0 + _spacing, 60);
+    _sound.position = CGPointMake(50 + _spacing, 80);
     _sound.name = @"sound";
-    _sound.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_sound.size];
     [_settings addChild:_sound];
     
     // Add Music Label
-    SKLabelNode* musicLabel = [SKLabelNode labelNodeWithFontNamed:@"Oswald-Bold"];
-    musicLabel.fontColor = [SKColor whiteColor];
-    musicLabel.fontSize = 30 + _addSizeToFont;
-    musicLabel.text = @"Music";
-    musicLabel.position = CGPointMake(-130 - _spacing, -30);
+    SKSpriteNode* musicLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"music_label"]];
+    musicLabel.position = CGPointMake(-130 - _spacing, 0);
     [_settings addChild:musicLabel];
     
     // Add Sounds scrollbar
@@ -297,17 +310,54 @@
     [_settings addChild:_musicScrollBar];
     
     // Add Sounds slider
-    _musicSlider = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings-slider"]];
+    _musicSlider = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"music_slider"]];
     _musicSlider.name = @"music";
     _musicSlider.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_musicSlider.size];
     _musicSlider.position = CGPointMake((_player.audioPlayer.volume * 186) - 93, 0);
     [_musicScrollBar addChild:_musicSlider];
     
+    // Add Controls Label
+    SKSpriteNode* controlsLabel = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"controls_label"]];
+    controlsLabel.position = CGPointMake(-110 - _spacing, -80);
+    [_settings addChild:controlsLabel];
+    
+    // Check if there are saved data for accelerometer
+    NSString* savedControlType = [_user stringForKey:@"accelerometer"];
+    if(savedControlType == nil){
+        // if no data found, then default is set to touch controls
+        _controlWithAccelerometer = NO;
+        NSLog(@"NO DATA FOUND. Default used");
+    } else {
+        _controlWithAccelerometer = [[_user stringForKey:@"accelerometer"] boolValue];
+        NSLog(@"DATA FOUND. Accelerometer: %d", _controlWithAccelerometer);
+    }
+    
+    // Add accelerometer icon based on saved or default data
+    if(_controlWithAccelerometer == YES) _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer"]];
+    else _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer_disabled"]];
+    
+    _controlAccelerometer.position = CGPointMake(controlsLabel.position.x + 120, controlsLabel.position.y);
+    _controlAccelerometer.name = @"accelerometer_control";
+    [_settings addChild:_controlAccelerometer];
+    
+    // Add touch icon based on saved or default data
+    if(_controlWithAccelerometer == YES) _controlTouch = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_touch_disabled"]];
+    else _controlTouch = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_touch"]];
+
+    _controlTouch.position = CGPointMake(_controlAccelerometer.position.x + _controlAccelerometer.size.width * 0.5 + 60, _controlAccelerometer.position.y);
+    _controlTouch.name = @"touch_control";
+    [_settings addChild:_controlTouch];
+    
+    if([cmm isAccelerometerAvailable] == NO){
+        // Enable choice of controls
+        _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer_disabled"]];
+    }
+    
     // Okay button
-    SKSpriteNode* okBtn = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-ok-settings"]];
-    okBtn.position = CGPointMake(0, _musicScrollBar.position.y - 100 - _spacing);
-    okBtn.name = @"okay";
-    [_settings addChild:okBtn];
+    _backBtn = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"btn-back-settings"]];
+    _backBtn.position = CGPointMake(0, -160 - _spacing);
+    _backBtn.name = @"back";
+    [_settings addChild:_backBtn];
 }
 
 
@@ -320,7 +370,5 @@
 - (void)update:(NSTimeInterval)currentTime{
     self.paused = NO;
 }
-
-
 
 @end

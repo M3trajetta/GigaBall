@@ -71,8 +71,9 @@
 }
 
 -(void)createExplosion{
-    NSString* path = [[NSBundle mainBundle] pathForResource:@"BrickExplosion" ofType:@"sks"];
-    SKEmitterNode* explosion = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+//    NSString* path = [[NSBundle mainBundle] pathForResource:@"BrickExplosion" ofType:@"sks"];
+//    SKEmitterNode* explosion = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+    SKEmitterNode* explosion = [self newExplosion];
     explosion.position = self.position;
     [self.parent addChild:explosion];
     
@@ -80,6 +81,39 @@
     SKAction* removeExplosion = [SKAction sequence:@[[SKAction waitForDuration:explosion.particleLifetime+explosion.particleLifetimeRange],
                                                      [SKAction removeFromParent]]];
     [explosion runAction: removeExplosion];
+}
+
+-(SKEmitterNode *)newExplosion
+{
+    //instantiate explosion emitter
+    SKEmitterNode *explosion = [[SKEmitterNode alloc] init];
+    
+    [explosion setParticleTexture:[SKTexture textureWithImageNamed:@"brick-green.png"]];
+    [explosion setParticleColor:[UIColor greenColor]];
+    [explosion setNumParticlesToEmit:10];
+    [explosion setParticleBirthRate:100];
+    [explosion setParticleLifetime:1];
+    [explosion setEmissionAngleRange:360];
+    [explosion setParticleSpeed:200];
+    [explosion setParticleSpeedRange:100];
+    [explosion setXAcceleration:0];
+    [explosion setYAcceleration:-1000];
+    [explosion setParticleAlpha:1];
+    [explosion setParticleAlphaRange:0.2];
+    [explosion setParticleAlphaSpeed:-1];
+    [explosion setParticleScale:0.2];
+    [explosion setParticleScaleRange:0.2];
+    [explosion setParticleScaleSpeed:-0.4];
+    [explosion setParticleRotation:0];
+    [explosion setParticleRotationRange:360];
+    [explosion setParticleRotationSpeed:0];
+    
+    [explosion setParticleColorBlendFactor:1];
+    [explosion setParticleColorBlendFactorRange:0];
+    [explosion setParticleColorBlendFactorSpeed:0];
+    [explosion setParticleBlendMode:SKBlendModeAdd];
+    
+    return explosion;
 }
 
 - (void)setPowerUp:(int)powerUp{

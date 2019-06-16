@@ -10,7 +10,6 @@
 typedef enum : NSUInteger{
     Normal = 1,
     Energy= 2,
-    Through = 3
 } BallType;
 
 NS_ASSUME_NONNULL_BEGIN

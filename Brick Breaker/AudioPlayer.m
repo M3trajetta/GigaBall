@@ -25,7 +25,7 @@
             _audioPlayer.numberOfLoops = -1;
         }
         _isPlaying = NO;
-        _audioPlayer.delegate = self;
+        _audioPlayer.delegate = _audioPlayer.delegate.self;
     }
     return self;
 }
