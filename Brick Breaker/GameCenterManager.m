@@ -93,7 +93,7 @@
                 [achievements addObject:intAchievement];
             }
 //
-//            if(score >= 200) {
+//            if(score >= 200000) {
 //                GKAchievement *expertAchievement = [[GKAchievement alloc] initWithIdentifier:ACHIEVEMENT_EXPERT_ID];
 //                expertAchievement.percentComplete = 100;
 //                [achievements addObject:expertAchievement];

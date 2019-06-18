@@ -376,7 +376,6 @@ CGFloat BALL_SPEED = 400;
     self.time = 0;
     _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTime) userInfo:nil repeats:YES];
     [_brickLayer removeAllChildren];
-    
     int row = 0;
     int col = 0;
     NSString* path = [[NSBundle mainBundle]pathForResource:@"Levels" ofType:@"plist"];
@@ -391,7 +390,7 @@ CGFloat BALL_SPEED = 400;
             if(brickType > 0){
                 Brick* brick = [[Brick alloc]initWithType:(BrickType)brickType];
                 if(brick){
-                    if(_smallSpace > 5){
+                    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
                         brick.size = CGSizeMake(brick.size.width * 1.2, brick.size.height * 1.2);
                         brick.position = CGPointMake(30 + (brick.size.width * 0.5) + (brick.size.width + 5) * col,
                                                      -(10 + (brick.size.height * 0.5) + (brick.size.height + 5) * row));
@@ -1132,6 +1131,42 @@ CGFloat BALL_SPEED = 400;
     }
 }
 
+// Different approach to paddle change
+-(void)changePaddle:(PaddleType)type{
+    switch (type) {
+        case Standard:
+            _paddle.texture = [SKTexture textureWithImageNamed:@"paddle"];
+            break;
+        case StandardBang:
+            _paddle.texture = [SKTexture textureWithImageNamed:@"paddle-laser"];
+            break;
+        case Small:
+            _paddle.texture = [SKTexture textureWithImageNamed:@"paddle-small"];
+            break;
+        case SmallBang:
+            _paddle.texture = [SKTexture textureWithImageNamed:@"paddle-small-laser"];
+            break;
+        case Big:
+            _paddle.texture = [SKTexture textureWithImageNamed:@"paddle-big"];
+            break;
+        case BigBang:
+            _paddle.texture = [SKTexture textureWithImageNamed:@"paddle-big-laser"];
+            break;
+        default:
+            break;
+    }
+    
+    _paddle.name = @"paddle";
+    _paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_paddle.size];
+    _paddle.physicsBody.friction = 0;
+    _paddle.physicsBody.linearDamping = 0;
+    _paddle.physicsBody.restitution = 1;
+    _paddle.physicsBody.categoryBitMask = paddleCategory;
+    _paddle.physicsBody.collisionBitMask = ballCategory;
+    _paddle.physicsBody.contactTestBitMask = ballCategory;
+    _paddle.physicsBody.dynamic = NO;
+}
+
 // Laser
 -(void)bangPower:(CGPoint)position{
     NSTimeInterval time;
@@ -1142,31 +1177,28 @@ CGFloat BALL_SPEED = 400;
     else time = 3;
     _canShoot = YES;
     PaddleType type = [_paddle getPaddleForLaser];
-    [_paddle removeFromParent];
-    [self createPaddle:type andPosition:position];
+    [self changePaddle:type];
     
     if(_canShoot){
         // Allow shooting for ~time seconds
         [self runAction:[SKAction waitForDuration:time] completion:^{
             self->_canShoot = NO;
-            [self getPaddlePosition];
-            [self->_paddle removeFromParent];
-            [self createPaddle:type-1 andPosition:self->_paddlePosition];
+            [self changePaddle:type-1];
         }];
     }
 }
 
--(void)getPaddlePosition{
-    _paddlePosition = _paddle.position;
-}
 
 // Shield power
 
 - (void)shieldPower{
     // Check if shield exists
+    NSTimeInterval time;
     if(_shieldCreated){
+        time = 5;
         [self updateScore:250];
     } else {
+        time = 5;
         _shieldCreated = YES;
         _shield.name = @"shield";
         _shield = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"shield"]];
@@ -1181,7 +1213,7 @@ CGFloat BALL_SPEED = 400;
         _shield.physicsBody.collisionBitMask = 0;
         _shield.physicsBody.contactTestBitMask = 0;
         [self addChild:_shield];
-        [self runAction:[SKAction waitForDuration:5] completion:^{
+        [self runAction:[SKAction waitForDuration:time] completion:^{
             [self->_shield removeFromParent];
             self->_shieldCreated = NO;
         }];

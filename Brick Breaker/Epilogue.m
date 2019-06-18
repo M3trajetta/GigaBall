@@ -32,7 +32,7 @@
         // Load data - Lives
         NSString* livesText = [user stringForKey:@"epilogue-lives"];
         // Load data - Score
-        NSString* scoreText = [user stringForKey:@"epilogue-score"];
+        //NSString* scoreText = [user stringForKey:@"epilogue-score"];
         // Load data - Score
         NSString* totalScoreText = [user stringForKey:@"epilogue-score"];
         // Load data - Level
@@ -83,7 +83,7 @@
         _lives = [SKLabelNode labelNodeWithFontNamed:@"zorque"];
         _lives.fontColor = [SKColor whiteColor];
         _lives.fontSize = 25 + _addSizeToFont;
-        _lives.text = [NSString stringWithFormat:@"%d", [livesText intValue]+2];
+        _lives.text = [NSString stringWithFormat:@"%d", [livesText intValue]+1];
         _lives.position = CGPointMake(0, livesLogo.position.y - 10 - _smallSpace);
         [epilogue addChild:_lives];
         

@@ -14,6 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Menu : SKScene
 @property (nonatomic) BOOL gamePaused;
+
+@property (nonatomic) SKConstraint* leftConstrain;
+@property (nonatomic) SKConstraint* rightConstrain;
+@property (nonatomic) SKConstraint* topConstrain;
+@property (nonatomic) SKConstraint* bottomConstrain;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -34,8 +34,6 @@
     
     [self setupCircleLayers];
     _timer = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(loadingView) userInfo:nil repeats:NO];
-    //UITapGestureRecognizer *singleFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(loadingView)];
-    //[self.view addGestureRecognizer:singleFingerTap];
     [self setupLoadingLabels];
 }
 
@@ -88,11 +86,24 @@
 //            skView.showsFPS = YES;
 //            skView.showsNodeCount = YES;
 //            skView.showsDrawCount = YES;
-
             // Create and configure the scene.
-            Menu* main = [[Menu alloc] initWithSize:skView.frame.size];
-            main.scaleMode = SKSceneScaleModeAspectFit;
-            [skView presentScene: main];
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+                CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+                if (screenSize.height >= 812){
+                    Menu* main = [[Menu alloc] initWithSize:CGSizeMake(screenSize.width, screenSize.height-74)];
+                    main.scaleMode = SKSceneScaleModeAspectFit;
+                    [skView presentScene: main];
+                } else {
+                    Menu* main = [[Menu alloc] initWithSize:skView.bounds.size];
+                    main.scaleMode = SKSceneScaleModeAspectFit;
+                    [skView presentScene: main];
+                }
+            } else {
+                Menu* main = [[Menu alloc] initWithSize:skView.bounds.size];
+                main.scaleMode = SKSceneScaleModeAspectFit;
+                [skView presentScene: main];
+            }
+            
         }
     }
 }

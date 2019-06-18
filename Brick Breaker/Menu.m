@@ -32,7 +32,6 @@
     SKSpriteNode* _controlTouch;
     SKSpriteNode* _backBtn;
     BOOL _soundOn;
-    BOOL _safeArea;
     BOOL _controlWithAccelerometer;
     AudioPlayer* _player;
     NSUserDefaults* _user;
@@ -44,6 +43,7 @@
 - (void)didMoveToView:(SKView *)view{
     //authenticate Game Center user if not already
     [[GameCenterManager sharedManager] authenticatePlayer];
+    
     _graphics = [SKTextureAtlas atlasNamed:@"Graphics"];
     self.physicsWorld.gravity = CGVectorMake(0.0, 0.0);
     
@@ -74,7 +74,7 @@
     [self addChild:background];
     
     // Add _foreground
-    _foreground = [[SKNode node]init];
+    _foreground = [[SKNode node] init];
     _foreground.position = CGPointMake(self.size.width * 0.5, self.size.height * 0.5);
     [self addChild:_foreground];
     
@@ -336,7 +336,7 @@
     if(_controlWithAccelerometer == YES) _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer"]];
     else _controlAccelerometer = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_accelerometer_disabled"]];
     
-    _controlAccelerometer.position = CGPointMake(controlsLabel.position.x + 120, controlsLabel.position.y);
+    _controlAccelerometer.position = CGPointMake(controlsLabel.position.x + 120 + _spacing, controlsLabel.position.y);
     _controlAccelerometer.name = @"accelerometer_control";
     [_settings addChild:_controlAccelerometer];
     
@@ -344,7 +344,7 @@
     if(_controlWithAccelerometer == YES) _controlTouch = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_touch_disabled"]];
     else _controlTouch = [SKSpriteNode spriteNodeWithTexture:[_graphics textureNamed:@"settings_touch"]];
 
-    _controlTouch.position = CGPointMake(_controlAccelerometer.position.x + _controlAccelerometer.size.width * 0.5 + 60, _controlAccelerometer.position.y);
+    _controlTouch.position = CGPointMake(_controlAccelerometer.position.x + _controlAccelerometer.size.width * 0.5 + 60 + _spacing, _controlAccelerometer.position.y);
     _controlTouch.name = @"touch_control";
     [_settings addChild:_controlTouch];
     

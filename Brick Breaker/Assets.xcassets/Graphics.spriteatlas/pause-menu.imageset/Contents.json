@@ -12,8 +12,16 @@
     },
     {
       "idiom" : "universal",
-      "filename" : "bg-menu@3x.png",
       "scale" : "3x"
+    },
+    {
+      "idiom" : "ipad",
+      "filename" : "bg-menu@3x.png",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "2x"
     }
   ],
   "info" : {
